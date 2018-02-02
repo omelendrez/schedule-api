@@ -1,0 +1,13 @@
+{
+  "name": "schedule server",
+  "version": "1.0.0",
+  "description": "Schedule backend",
+  "main": "server.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Omar Melendrez",
+  "license": "ISC"
+}
