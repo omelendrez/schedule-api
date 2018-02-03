@@ -7,7 +7,6 @@ router.use(function(req, res, next) {
   console.log("%s %s %s", req.method, req.url, req.path);
   next();
 });
-router.get("/:id", position.findById);
 router.get("/", position.findAll);
 router.post("/", position.create);
 router.put("/:id", position.update);

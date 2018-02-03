@@ -7,9 +7,9 @@ router.use(function(req, res, next) {
   console.log("%s %s %s", req.method, req.url, req.path);
   next();
 });
-router.get("/:id", profile.findById);
 router.get("/", profile.findAll);
 router.post("/", profile.create);
 router.delete("/:id", profile.delete);
+router.get("/:id", profile.update);
 
 module.exports = router;

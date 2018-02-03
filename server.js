@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({
 app.use(logger("combined"));
 
 models.sequelize.sync({
-  force: true
+  force: false
 });
 
 app.use(function(req, res, next) {

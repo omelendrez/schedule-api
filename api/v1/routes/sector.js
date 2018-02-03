@@ -7,7 +7,6 @@ router.use(function(req, res, next) {
   console.log("%s %s %s", req.method, req.url, req.path);
   next();
 });
-router.get("/:id", sector.findById);
 router.get("/", sector.findAll);
 router.post("/", sector.create);
 router.put("/:id", sector.update);

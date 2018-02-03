@@ -1,84 +1,38 @@
 "use strict";
-const Bvailability = require("../models").bvailability;
+const Availability = require("../models").availability;
 
 module.exports = {
-
   create(req, res) {
-    let product_id = req.body.product_id;
-    let quantity = req.body.quantity;
-    let unit_price = 0;
-    let discount_id = 0;
-    let percent = 0;
+    const employee_id = req.body.employee_id;
+    const mo = req.body.mo;
+    const tu = req.body.tu;
+    const we = req.body.we;
+    const th = req.body.th;
+    const fr = req.body.fr;
+    const sa = req.body.sa;
+    const su = req.body.su;
 
-    Product
-      .findOne({
-        where: {
-          id: product_id
-        },
-        attributes: ['price']
-      }).then(result => {
-        unit_price = result.get({
-          plain: true
-        }).price;
-
-        ProductDiscount
-          .findOne({
-            where: {
-              product_id: product_id
-            },
-            attributes: ['discount_id']
-          }).then(result => {
-            if (result) {
-              discount_id = result.get({
-                plain: true
-              }).discount_id;
-              discount_id = discount_id ? discount_id : 0;
-            } else {
-              discount_id = 0;
-            }
-
-            Discount
-              .findOne({
-                where: {
-                  id: discount_id
-                },
-                attributes: ['percent']
-              }).then(result => {
-                if (result) {
-                  percent = result.get({
-                    plain: true
-                  }).percent;
-                  percent = percent ? percent : 0;
-                } else {
-                  percent = 0;
-                }
-
-                let total_price = unit_price * quantity;
-                let discount = total_price * percent / 100;
-                let net_price = total_price - discount;
-
-                Bvailability
-                  .create({
-                    product_id: product_id,
-                    quantity: quantity,
-                    unit_price: unit_price,
-                    total_price: total_price,
-                    discount: discount,
-                    net_price: net_price
-                  })
-                  .then(bvailability => res.status(201).json(bvailability))
-                  .catch(error => res.status(400).json(error));
-              });
-          });
+    return Availability
+      .create({
+        employee_id: employee_id,
+        mo: mo,
+        tu: tu,
+        we: we,
+        th: th,
+        fr: fr,
+        sa: sa,
+        su: su
       })
-  },
+      .then(availability => res.status(201).json(availability))
+      .catch(error => res.status(400).json(error));
+    },
 
   findAll(req, res) {
-    return Bvailability
+    return Availability
       .findAll({
         raw: true
       })
-      .then(bvailability => res.json(bvailability))
+      .then(availability => res.json(availability))
       .catch(error => res.status(400).send(error));
   }
 };
