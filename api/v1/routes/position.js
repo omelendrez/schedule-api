@@ -8,6 +8,7 @@ router.use(function(req, res, next) {
   next();
 });
 router.get("/", position.findAll);
+router.get("/:id/sector", position.findBySectorId);
 router.post("/", position.create);
 router.put("/:id", position.update);
 router.delete("/:id", position.delete);

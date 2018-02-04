@@ -6,7 +6,14 @@ module.exports = {
   create(req, res) {
     return Employee
       .create({
-        name: req.body.name,
+        badge: req.body.badge,
+        last_name: req.body.last_name,
+        first_name: req.body.first_name,
+        joining_date: req.body.joining_date,
+        position_id: req.body.position_id,
+        sector_id: req.body.sector_id,
+        branch_id: req.body.branch_id,
+        exit_date: req.body.exit_date,
         status_id: req.body.status_id
       })
       .then(employee => res.status(201).json(employee))
@@ -15,37 +22,63 @@ module.exports = {
 
   findAll(req, res) {
     const Status = require("../models").status;
+    const Sector = require("../models").sector;
+    const Position = require("../models").position;
+    const Branch = require("../models").branch;
+
     Employee.belongsTo(Status);
+    Employee.belongsTo(Sector);
+    Employee.belongsTo(Position);
+    Employee.belongsTo(Branch);
 
     const page = parseInt(req.query.page ? req.query.page : 0);
     const size = parseInt(req.query.size ? req.query.size : 1000);
-    const sort = req.query.sort ? req.query.sort : 'name';
+    const sort = req.query.sort ? req.query.sort : 'badge';
     const type = req.query.type ? req.query.type : 'asc';
     const filter = req.query.filter ? req.query.filter : '';
 
     return Employee
       .findAndCountAll({
         where: {
-          name: {
+          last_name: {
+            $like: '%' + filter + '%'
+          },
+          first_name: {
             $like: '%' + filter + '%'
           }
+
         },
         order: [
           [sort, type]
         ],
         offset: size !== 1000 ? (page - 1) * size : 0,
         limit: size,
-        include: [{
-          model: Status,
-          where: {
-            id: sequelize.col('employee.status_id')
+        include: [
+          {
+            model: Status,
+            where: {
+              id: sequelize.col('employee.status_id')
+            }
+          },
+          {
+            model: Sector,
+            where: {
+              id: sequelize.col('employee.sector_id')
+            }
+          },
+          {
+            model: Position,
+            where: {
+              id: sequelize.col('employee.position_id')
+            }
+          },
+          {
+            model: Branch,
+            where: {
+              id: sequelize.col('employee.branch_id')
+            }
           }
-        }],
-        attributes: [
-          'id',
-          'name',
-          'image'
-        ]
+        ],
       })
       .then(categories => res.json(categories))
       .catch(error => res.status(400).send(error));
@@ -53,25 +86,45 @@ module.exports = {
 
   findById(req, res) {
     const Status = require("../models").status;
+    const Sector = require("../models").sector;
+    const Position = require("../models").position;
+    const Branch = require("../models").branch;
+
     Employee.belongsTo(Status);
+    Employee.belongsTo(Sector);
+    Employee.belongsTo(Position);
+    Employee.belongsTo(Branch);
 
     return Employee
       .findOne({
         where: {
           id: req.params.id
         },
-        include: [{
-          model: Status,
-          where: {
-            id: sequelize.col('employee.status_id')
+        include: [
+          {
+            model: Status,
+            where: {
+              id: sequelize.col('employee.status_id')
+            }
+          },
+          {
+            model: Sector,
+            where: {
+              id: sequelize.col('employee.sector_id')
+            }
+          },
+          {
+            model: Position,
+            where: {
+              id: sequelize.col('employee.position_id')
+            }
+          },
+          {
+            model: Branch,
+            where: {
+              id: sequelize.col('employee.branch_id')
+            }
           }
-        }],
-        attributes: [
-          'id',
-          'name',
-          'image',
-          'status_id', [sequelize.fn('date_format', sequelize.col('employee.created_at'), '%d-%b-%y %H:%i'), 'created_at'],
-          [sequelize.fn('date_format', sequelize.col('employee.updated_at'), '%d-%b-%y %H:%i'), 'updated_at']
         ]
       })
       .then(employee => employee ? res.json(employee) : res.status(404).json({
@@ -101,8 +154,16 @@ module.exports = {
           id: req.params.id
         }
       })
-      .then(employee => employee.update({
-          name: req.body.name,
+      .then(employee => employee.update(
+        {
+          badge: req.body.badge,
+          last_name: req.body.last_name,
+          first_name: req.body.first_name,
+          joining_date: req.body.joining_date,
+          position_id: req.body.position_id,
+          sector_id: req.body.sector_id,
+          branch_id: req.body.branch_id,
+          exit_date: req.body.exit_date,
           status_id: req.body.status_id
         })
         .then(result => {

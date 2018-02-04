@@ -13,11 +13,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
-    birth_date: {
-      type: DataTypes.DATE,
+    branch_id: {
+      type: DataTypes.INTEGER,
       allowNull: false
     },
-    branch_id: {
+    position_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
@@ -30,8 +30,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     exit_date: {
-      type: DataTypes.DATE,
-      allowNull: false
+      type: DataTypes.DATE
     },
     status_id: {
       type: DataTypes.INTEGER,

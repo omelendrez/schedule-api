@@ -20,7 +20,7 @@ module.exports = {
 
   findAll(req, res) {
     return Budget
-      .findAll({
+      .findAndCountAll({
         raw: true
       })
       .then(budget => res.json(budget))

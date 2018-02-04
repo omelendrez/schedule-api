@@ -8,6 +8,8 @@ router.use(function(req, res, next) {
   next();
 });
 router.get("/", availability.findAll);
+router.get("/:id", availability.findById);
+router.get("/:id/employee", availability.findByEmployeeId);
 router.post("/", availability.create);
 
 module.exports = router;

@@ -8,6 +8,9 @@ router.use(function(req, res, next) {
   next();
 });
 router.post("/", schedule.create);
+router.get("/:id", schedule.findById);
+router.get("/:id/budget", schedule.findByBudgetId);
+router.put("/:id", schedule.update);
 router.delete("/:id", schedule.delete);
 
 module.exports = router;

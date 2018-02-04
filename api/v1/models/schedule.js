@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    function: {
+    position: {
       type: DataTypes.INTEGER,
       allowNull: false
     },

@@ -18,7 +18,7 @@ module.exports = {
 
   findAll(req, res) {
     return Branch
-      .findAll({
+      .findAndCountAll({
         raw: true
       })
       .then(branch => res.json(branch))

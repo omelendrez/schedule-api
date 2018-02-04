@@ -13,7 +13,7 @@ module.exports = {
 
   findAll(req, res) {
     return Status
-      .findAll({
+      .findAndCountAll({
         raw: true
       })
       .then(status => res.json(status))

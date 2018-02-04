@@ -8,6 +8,7 @@ router.use(function(req, res, next) {
   next();
 });
 router.get("/:id", timeoff.findById);
+router.get("/:id/employee", timeoff.findByEmployeeId);
 router.get("/", timeoff.findAll);
 router.post("/", timeoff.create);
 router.put("/:id", timeoff.update);

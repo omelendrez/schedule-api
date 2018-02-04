@@ -8,7 +8,8 @@ module.exports = {
       .create({
         user_name: req.body.user_name,
         password: req.body.password,
-        full_name: req.body.full_name
+        full_name: req.body.full_name,
+        profile_id: req.body.profile_id
       })
       .then(user => res.status(201).json(user))
       .catch(error => res.status(400).send(error));
@@ -16,7 +17,9 @@ module.exports = {
 
   findAll(req, res) {
     const Status = require("../models").status;
+    const Profile = require("../models").profile;
     User.belongsTo(Status);
+    User.belongsTo(Profile);
 
     const page = parseInt(req.query.page ? req.query.page : 0);
     const size = parseInt(req.query.size ? req.query.size : 1000);
@@ -41,12 +44,12 @@ module.exports = {
           where: {
             id: sequelize.col('user.status_id')
           }
-        }],
-        attributes: [
-          'id',
-          'user_name',
-          'full_name'
-        ]
+        }, {
+          model: Profile,
+          where: {
+            id: sequelize.col('user.profile_id')
+          }
+        }]
       })
       .then(users => res.json(users))
       .catch(error => res.status(400).json(error));
@@ -66,14 +69,12 @@ module.exports = {
           where: {
             id: sequelize.col('user.status_id')
           }
-        }],
-        attributes: [
-          'id',
-          'user_name',
-          'full_name',
-          'status_id', [sequelize.fn('date_format', sequelize.col('user.created_at'), '%d-%b-%y %H:%i'), 'created_at'],
-          [sequelize.fn('date_format', sequelize.col('user.updated_at'), '%d-%b-%y %H:%i'), 'updated_at']
-        ]
+        }, {
+          model: Profile,
+          where: {
+            id: sequelize.col('user.profile_id')
+          }
+        }]
       })
       .then(user => user ? res.json(user) : res.status(404).json({
         "error": "Not found"
@@ -117,10 +118,12 @@ module.exports = {
           id: req.params.id
         }
       })
-      .then(user => user.update({
+      .then(user => user.update(
+        {
           user_name: req.body.user_name,
+          password: req.body.password,
           full_name: req.body.full_name,
-          status_id: req.body.status_id
+          profile_id: req.body.profile_id
         })
         .then(result => {
           res.json(result);

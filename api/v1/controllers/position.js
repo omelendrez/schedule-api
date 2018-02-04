@@ -41,17 +41,24 @@ module.exports = {
           where: {
             id: sequelize.col('position.sector_id')
           }
-        }],
-        attributes: [
-          'id',
-          'name',
-          'sector_id'
-        ]
+        }]
       })
-      .then(positions => res.json(positions))
+      .then(position => res.json(position))
       .catch(error => res.status(400).send(error));
   },
+  findBySectorId(req, res) {
 
+    return Position
+      .findAndCountAll({
+        where: {
+          sector_id: req.params.id
+        },
+      })
+      .then(position => position ? res.json(position) : res.status(404).json({
+        "error": "Not found"
+      }))
+      .catch(error => res.status(400).send(error));
+  },
   delete(req, res) {
     return Position
       .findOne({
@@ -73,12 +80,11 @@ module.exports = {
           id: req.params.id
         }
       })
-      .then(position => position.update({
-        name: req.body.name,
-        description: req.body.description,
-        percent: req.body.percent,
-        status_id: req.body.status_id
-      })
+      .then(position => position.update(
+        {
+          name: req.body.name,
+          sector_id: req.body.sector_id
+        })
         .then(result => {
           res.json(result);
         }))

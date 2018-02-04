@@ -31,13 +31,9 @@ module.exports = {
           [sort, type]
         ],
         offset: size !== 1000 ? (page - 1) * size : 0,
-        limit: size,
-        attributes: [
-          'id',
-          'name'
-        ]
+        limit: size
       })
-      .then(sectors => res.json(sectors))
+      .then(sector => res.json(sector))
       .catch(error => res.status(400).send(error));
   },
   delete(req, res) {
@@ -62,8 +58,8 @@ module.exports = {
         }
       })
       .then(sector => sector.update({
-          name: req.body.name
-        })
+        name: req.body.name
+      })
         .then(result => {
           res.json(result);
         }))

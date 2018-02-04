@@ -31,13 +31,9 @@ module.exports = {
           [sort, type]
         ],
         offset: size !== 1000 ? (page - 1) * size : 0,
-        limit: size,
-        attributes: [
-          'id',
-          'name'
-        ]
+        limit: size
       })
-      .then(profiles => res.json(profiles))
+      .then(profile => res.json(profile))
       .catch(error => res.status(400).send(error));
   },
 

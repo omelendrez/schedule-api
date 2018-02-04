@@ -25,11 +25,36 @@ module.exports = {
       })
       .then(availability => res.status(201).json(availability))
       .catch(error => res.status(400).json(error));
-    },
+  },
+  findById(req, res) {
 
+    return Availability
+      .findOne({
+        where: {
+          id: req.params.id
+        },
+      })
+      .then(availability => availability ? res.json(availability) : res.status(404).json({
+        "error": "Not found"
+      }))
+      .catch(error => res.status(400).send(error));
+  },
+  findByEmployeeId(req, res) {
+
+    return Availability
+      .findAndCountAll({
+        where: {
+          employee_id: req.params.id
+        },
+      })
+      .then(availability => availability ? res.json(availability) : res.status(404).json({
+        "error": "Not found"
+      }))
+      .catch(error => res.status(400).send(error));
+  },
   findAll(req, res) {
     return Availability
-      .findAll({
+      .findAndCountAll({
         raw: true
       })
       .then(availability => res.json(availability))
