@@ -35,7 +35,7 @@ app.use("/schedule", require(apiPath + "/routes/schedule"));
 app.use("/sector", require(apiPath + "/routes/sector"));
 app.use("/status", require(apiPath + "/routes/status"));
 app.use("/timeoff", require(apiPath + "/routes/timeoff"));
-app.use("/users", require(apiPath + "/routes/user"));
+app.use("/user", require(apiPath + "/routes/user"));
 
 app.use("/login", require(apiPath + "/routes/login"));
 
