@@ -1,0 +1,19 @@
+"use strict";
+module.exports = function(sequelize, DataTypes) {
+  const Timeoff = sequelize.define("timeoff", {
+    employee_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false
+    }
+  }, {
+    indexes: [{
+      fields: ["employee_id"]
+    }]
+  });
+
+  return Timeoff;
+};
