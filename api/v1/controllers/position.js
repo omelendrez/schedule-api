@@ -26,6 +26,7 @@ module.exports = {
 
     return Position
       .findAndCountAll({
+        raw: true,
         where: {
           name: {
             $like: '%' + filter + '%'
@@ -36,11 +37,20 @@ module.exports = {
         ],
         offset: size !== 1000 ? (page - 1) * size : 0,
         limit: size,
+        attributes: [
+          'id',
+          'name',
+          [sequelize.fn('date_format', sequelize.col('position.created_at'), '%d-%b-%y'), 'created_at'],
+          [sequelize.fn('date_format', sequelize.col('position.updated_at'), '%d-%b-%y'), 'updated_at']
+        ],
         include: [{
           model: Sector,
           where: {
             id: sequelize.col('position.sector_id')
-          }
+          },
+          attributes: [
+            'name'
+          ]
         }]
       })
       .then(position => res.json(position))

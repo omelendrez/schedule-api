@@ -22,6 +22,7 @@ module.exports = {
 
     return sector
       .findAndCountAll({
+        raw: true,
         where: {
           name: {
             $like: '%' + filter + '%'
@@ -31,7 +32,14 @@ module.exports = {
           [sort, type]
         ],
         offset: size !== 1000 ? (page - 1) * size : 0,
-        limit: size
+        limit: size,
+        attributes: [
+          'id',
+          'name',
+          [sequelize.fn('date_format', sequelize.col('sector.created_at'), '%d-%b-%y'), 'created_at'],
+          [sequelize.fn('date_format', sequelize.col('sector.updated_at'), '%d-%b-%y'), 'updated_at']
+        ]
+
       })
       .then(sector => res.json(sector))
       .catch(error => res.status(400).send(error));
