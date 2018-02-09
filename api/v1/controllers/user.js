@@ -7,7 +7,6 @@ module.exports = {
     return User
       .create({
         user_name: req.body.user_name,
-        password: req.body.password,
         full_name: req.body.full_name,
         profile_id: req.body.profile_id
       })
@@ -135,7 +134,6 @@ module.exports = {
       .then(user => user.update(
         {
           user_name: req.body.user_name,
-          password: req.body.password,
           full_name: req.body.full_name,
           profile_id: req.body.profile_id
         })
