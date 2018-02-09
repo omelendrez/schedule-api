@@ -3,7 +3,6 @@ const Branch = require("../models").branch;
 const sequelize = require("sequelize");
 
 module.exports = {
-
   create(req, res) {
     const name = req.body.name;
     const status_id = req.body.status_id;
@@ -42,5 +41,36 @@ module.exports = {
       })
       .then(branch => res.json(branch))
       .catch(error => res.status(400).send(error));
+  },
+  delete(req, res) {
+    return Branch
+      .findOne({
+        where: {
+          id: req.params.id
+        }
+      })
+      .then(branch => branch.destroy()
+        .then(result => {
+          res.json(result);
+        }))
+      .catch(error => res.status(400).send(error));
+  },
+
+  update(req, res) {
+    return Branch
+      .findOne({
+        where: {
+          id: req.params.id
+        }
+      })
+      .then(branch => branch.update(
+        {
+          name: req.body.name
+        })
+        .then(result => {
+          res.json(result);
+        }))
+      .catch(error => res.status(400).send(error));
   }
+
 };
