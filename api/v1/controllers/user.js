@@ -29,6 +29,7 @@ module.exports = {
 
     return User
       .findAndCountAll({
+        raw: true,
         where: {
           full_name: {
             $like: '%' + filter + '%'
@@ -43,13 +44,26 @@ module.exports = {
           model: Status,
           where: {
             id: sequelize.col('user.status_id')
-          }
+          },
+          attributes: [
+            'name'
+          ]
         }, {
           model: Profile,
           where: {
             id: sequelize.col('user.profile_id')
-          }
-        }]
+          },
+          attributes: [
+            'name'
+          ]
+        }],
+        attributes: [
+          'id',
+          'user_name',
+          'full_name',
+          [sequelize.fn('date_format', sequelize.col('user.created_at'), '%d-%b-%y'), 'created_at'],
+          [sequelize.fn('date_format', sequelize.col('user.updated_at'), '%d-%b-%y'), 'updated_at']
+        ]
       })
       .then(users => res.json(users))
       .catch(error => res.status(400).json(error));
@@ -91,8 +105,8 @@ module.exports = {
           status_id: 1
         }
       })
-      .then(user => user ? res.json(user) : res.status(404).json({
-        "error": "Not found"
+      .then(user => user ? res.json(user) : res.json({
+        "id": 0
       }))
       .catch(error => res.status(400).send(error));
   },

@@ -39,6 +39,7 @@ module.exports = {
 
     return Employee
       .findAndCountAll({
+        raw: true,
         where: {
           last_name: {
             $like: '%' + filter + '%'
@@ -58,27 +59,49 @@ module.exports = {
             model: Status,
             where: {
               id: sequelize.col('employee.status_id')
-            }
+            },
+            attributes: [
+              'name'
+            ]
           },
           {
             model: Sector,
             where: {
               id: sequelize.col('employee.sector_id')
-            }
+            },
+            attributes: [
+              'name'
+            ]
           },
           {
             model: Position,
             where: {
               id: sequelize.col('employee.position_id')
-            }
+            },
+            attributes: [
+              'name'
+            ]
           },
           {
             model: Branch,
             where: {
               id: sequelize.col('employee.branch_id')
-            }
+            },
+            attributes: [
+              'name'
+            ]
           }
         ],
+        attributes: [
+          'id',
+          'badge',
+          'last_name',
+          'first_name',
+          'badge',
+          [sequelize.fn('date_format', sequelize.col('employee.joining_date'), '%d-%b-%y'), 'joining_date'],
+          [sequelize.fn('date_format', sequelize.col('employee.created_at'), '%d-%b-%y'), 'created_at'],
+          [sequelize.fn('date_format', sequelize.col('employee.updated_at'), '%d-%b-%y'), 'updated_at']
+        ]
       })
       .then(categories => res.json(categories))
       .catch(error => res.status(400).send(error));

@@ -1,5 +1,6 @@
 "use strict";
 const Branch = require("../models").branch;
+const sequelize = require("sequelize");
 
 module.exports = {
 
@@ -17,9 +18,27 @@ module.exports = {
   },
 
   findAll(req, res) {
+    const Status = require("../models").status;
+    Branch.belongsTo(Status);
+
     return Branch
       .findAndCountAll({
-        raw: true
+        raw: true,
+        include: [{
+          model: Status,
+          where: {
+            id: sequelize.col('branch.status_id')
+          },
+          attributes: [
+            'name'
+          ]
+        }],
+        attributes: [
+          'id',
+          'name',
+          [sequelize.fn('date_format', sequelize.col('branch.created_at'), '%d-%b-%y'), 'created_at'],
+          [sequelize.fn('date_format', sequelize.col('branch.updated_at'), '%d-%b-%y'), 'updated_at']
+        ]
       })
       .then(branch => res.json(branch))
       .catch(error => res.status(400).send(error));

@@ -1,7 +1,7 @@
 "use strict";
 const bcrypt = require("bcrypt-nodejs");
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const User = sequelize.define("user", {
     user_name: {
       type: DataTypes.STRING,
@@ -19,15 +19,20 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
+    profile_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     status_id: {
       type: DataTypes.INTEGER,
       defaultValue: 1
     },
   }, {
-    indexes: [{
-      unique: true,
-      fields: ["user_name"]
-    }]
+    indexes: [
+      {
+        unique: true,
+        fields: ["user_name"]
+      }]
   });
 
   return User;
