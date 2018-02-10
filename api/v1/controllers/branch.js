@@ -35,6 +35,7 @@ module.exports = {
         attributes: [
           'id',
           'name',
+          'status_id',
           [sequelize.fn('date_format', sequelize.col('branch.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('branch.updated_at'), '%d-%b-%y'), 'updated_at']
         ]
@@ -49,7 +50,9 @@ module.exports = {
           id: req.params.id
         }
       })
-      .then(branch => branch.destroy()
+      .then(branch => branch.update({
+        status_id: branch.status_id === 1 ? 2 : 1
+      })
         .then(result => {
           res.json(result);
         }))

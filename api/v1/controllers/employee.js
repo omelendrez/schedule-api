@@ -98,6 +98,7 @@ module.exports = {
           'last_name',
           'first_name',
           'badge',
+          'status_id',
           [sequelize.fn('date_format', sequelize.col('employee.joining_date'), '%d-%b-%y'), 'joining_date'],
           [sequelize.fn('date_format', sequelize.col('employee.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('employee.updated_at'), '%d-%b-%y'), 'updated_at']
@@ -163,7 +164,11 @@ module.exports = {
           id: req.params.id
         }
       })
-      .then(employee => employee.destroy()
+      .then(employee => employee.update(
+        {
+          status_id: employee.status_id === 1 ? 2 : 1
+        }
+      )
         .then(result => {
           res.json(result);
         }))

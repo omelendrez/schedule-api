@@ -60,6 +60,7 @@ module.exports = {
           'id',
           'user_name',
           'full_name',
+          'status_id',
           [sequelize.fn('date_format', sequelize.col('user.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('user.updated_at'), '%d-%b-%y'), 'updated_at']
         ]
@@ -117,7 +118,9 @@ module.exports = {
           id: req.params.id
         }
       })
-      .then(user => user.destroy()
+      .then(user => user.update({
+        status_id: user.status_id === 1 ? 2 : 1
+      })
         .then(result => {
           res.json(result);
         }))
