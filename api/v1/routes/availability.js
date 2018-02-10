@@ -11,5 +11,6 @@ router.get("/", availability.findAll);
 router.get("/:id", availability.findById);
 router.get("/:id/employee", availability.findByEmployeeId);
 router.post("/", availability.create);
+router.put("/:id", availability.update);
 
 module.exports = router;

@@ -29,9 +29,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATE,
       allowNull: false
     },
-    exit_date: {
-      type: DataTypes.DATE
-    },
     status_id: {
       type: DataTypes.INTEGER,
       defaultValue: 1

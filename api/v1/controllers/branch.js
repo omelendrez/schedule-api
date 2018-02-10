@@ -3,7 +3,6 @@ const Branch = require("../models").branch;
 const sequelize = require("sequelize");
 
 module.exports = {
-
   create(req, res) {
     const name = req.body.name;
     const status_id = req.body.status_id;
@@ -36,11 +35,45 @@ module.exports = {
         attributes: [
           'id',
           'name',
+          'status_id',
           [sequelize.fn('date_format', sequelize.col('branch.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('branch.updated_at'), '%d-%b-%y'), 'updated_at']
         ]
       })
       .then(branch => res.json(branch))
       .catch(error => res.status(400).send(error));
+  },
+  delete(req, res) {
+    return Branch
+      .findOne({
+        where: {
+          id: req.params.id
+        }
+      })
+      .then(branch => branch.update({
+        status_id: branch.status_id === 1 ? 2 : 1
+      })
+        .then(result => {
+          res.json(result);
+        }))
+      .catch(error => res.status(400).send(error));
+  },
+
+  update(req, res) {
+    return Branch
+      .findOne({
+        where: {
+          id: req.params.id
+        }
+      })
+      .then(branch => branch.update(
+        {
+          name: req.body.name
+        })
+        .then(result => {
+          res.json(result);
+        }))
+      .catch(error => res.status(400).send(error));
   }
+
 };

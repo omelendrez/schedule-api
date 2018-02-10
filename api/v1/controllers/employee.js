@@ -13,8 +13,7 @@ module.exports = {
         position_id: req.body.position_id,
         sector_id: req.body.sector_id,
         branch_id: req.body.branch_id,
-        exit_date: req.body.exit_date,
-        status_id: req.body.status_id
+        status_id: 1
       })
       .then(employee => res.status(201).json(employee))
       .catch(error => res.status(400).send(error));
@@ -98,7 +97,12 @@ module.exports = {
           'last_name',
           'first_name',
           'badge',
-          [sequelize.fn('date_format', sequelize.col('employee.joining_date'), '%d-%b-%y'), 'joining_date'],
+          'status_id',
+          'branch_id',
+          'sector_id',
+          'position_id',
+          [sequelize.fn('date_format', sequelize.col('employee.joining_date'), '%Y-%m-%d'), 'joining_date'],
+          [sequelize.fn('date_format', sequelize.col('employee.joining_date'), '%d-%b-%y'), '_joining_date'],
           [sequelize.fn('date_format', sequelize.col('employee.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('employee.updated_at'), '%d-%b-%y'), 'updated_at']
         ]
@@ -163,7 +167,11 @@ module.exports = {
           id: req.params.id
         }
       })
-      .then(employee => employee.destroy()
+      .then(employee => employee.update(
+        {
+          status_id: employee.status_id === 1 ? 2 : 1
+        }
+      )
         .then(result => {
           res.json(result);
         }))
@@ -182,12 +190,10 @@ module.exports = {
           badge: req.body.badge,
           last_name: req.body.last_name,
           first_name: req.body.first_name,
-          joining_date: req.body.joining_date,
+          joining_date: req.body.joining_date + " 00:00:00",
           position_id: req.body.position_id,
           sector_id: req.body.sector_id,
-          branch_id: req.body.branch_id,
-          exit_date: req.body.exit_date,
-          status_id: req.body.status_id
+          branch_id: req.body.branch_id
         })
         .then(result => {
           res.json(result);

@@ -7,7 +7,6 @@ module.exports = {
     return User
       .create({
         user_name: req.body.user_name,
-        password: req.body.password,
         full_name: req.body.full_name,
         profile_id: req.body.profile_id
       })
@@ -61,6 +60,8 @@ module.exports = {
           'id',
           'user_name',
           'full_name',
+          'status_id',
+          'profile_id',
           [sequelize.fn('date_format', sequelize.col('user.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('user.updated_at'), '%d-%b-%y'), 'updated_at']
         ]
@@ -72,6 +73,8 @@ module.exports = {
   findById(req, res) {
     const Status = require("../models").status;
     User.belongsTo(Status);
+    const Profile = require("../models").profile;
+    User.belongsTo(Profile);
 
     return User
       .findOne({
@@ -118,7 +121,9 @@ module.exports = {
           id: req.params.id
         }
       })
-      .then(user => user.destroy()
+      .then(user => user.update({
+        status_id: user.status_id === 1 ? 2 : 1
+      })
         .then(result => {
           res.json(result);
         }))
@@ -135,7 +140,6 @@ module.exports = {
       .then(user => user.update(
         {
           user_name: req.body.user_name,
-          password: req.body.password,
           full_name: req.body.full_name,
           profile_id: req.body.profile_id
         })
