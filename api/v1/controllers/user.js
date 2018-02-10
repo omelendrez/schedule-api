@@ -61,6 +61,7 @@ module.exports = {
           'user_name',
           'full_name',
           'status_id',
+          'profile_id',
           [sequelize.fn('date_format', sequelize.col('user.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('user.updated_at'), '%d-%b-%y'), 'updated_at']
         ]
@@ -72,6 +73,8 @@ module.exports = {
   findById(req, res) {
     const Status = require("../models").status;
     User.belongsTo(Status);
+    const Profile = require("../models").profile;
+    User.belongsTo(Profile);
 
     return User
       .findOne({
