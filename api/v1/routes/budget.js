@@ -9,5 +9,7 @@ router.use(function(req, res, next) {
 });
 router.get("/", budget.findAll);
 router.post("/", budget.create);
+router.put("/:id", budget.update);
+router.delete("/:id", budget.delete);
 
 module.exports = router;
