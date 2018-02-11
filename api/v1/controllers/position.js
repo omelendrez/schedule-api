@@ -8,7 +8,8 @@ module.exports = {
     return Position
       .create({
         name: req.body.name,
-        sector_id: req.body.sector_id
+        sector_id: req.body.sector_id,
+        color: req.body.color
       })
       .then(position => res.status(201).send(position))
       .catch(error => res.status(400).send(error));
@@ -41,6 +42,7 @@ module.exports = {
           'id',
           'name',
           'sector_id',
+          'color',
           [sequelize.fn('date_format', sequelize.col('position.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('position.updated_at'), '%d-%b-%y'), 'updated_at']
         ],
@@ -94,7 +96,8 @@ module.exports = {
       .then(position => position.update(
         {
           name: req.body.name,
-          sector_id: req.body.sector_id
+          sector_id: req.body.sector_id,
+          color: req.body.color
         })
         .then(result => {
           res.json(result);
