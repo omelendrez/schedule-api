@@ -3,7 +3,7 @@ const user = require("../controllers/user");
 const express = require("express");
 const router = express.Router();
 
-router.use(function(req, res, next) {
+router.use(function (req, res, next) {
   console.log("%s %s %s", req.method, req.url, req.path);
   next();
 });
@@ -12,5 +12,6 @@ router.get("/", user.findAll);
 router.post("/", user.create);
 router.put("/:id", user.update);
 router.delete("/:id", user.delete);
+router.put("/:id/password", user.changePassword)
 
 module.exports = router;

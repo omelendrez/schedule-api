@@ -147,5 +147,31 @@ module.exports = {
           res.json(result);
         }))
       .catch(error => res.status(400).send(error));
+  },
+  changePassword(req, res) {
+    return User
+      .findOne({
+        where: {
+          id: req.params.id,
+          password: req.body.password_current
+        }
+      })
+      .then(user => user.update(
+        {
+          password: req.body.password_new
+        })
+        .then(result => {
+          res.json(result);
+        })
+        .catch(error => res.json({
+          error: error,
+          msg: "No se pudo cambiar la password"
+        }))
+      )
+      .catch(error => res.json({
+        error: error,
+        msg: "Password actual no es correcta"
+      }));
   }
+
 };
