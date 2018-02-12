@@ -9,7 +9,8 @@ module.exports = {
       .create({
         branch_id: req.body.branch_id,
         date: req.body.date + " 00:00:00",
-        hours: req.body.hours
+        hours: req.body.hours,
+        footer: req.body.footer
       })
       .then(budget => res.status(201).json(budget))
       .catch(error => res.status(400).json(error));
@@ -28,6 +29,7 @@ module.exports = {
           [sequelize.fn('date_format', sequelize.col('date'), '%d-%m-%y'), 'date'],
           [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), '_date'],
           'hours',
+          'footer',
           [sequelize.fn('date_format', sequelize.col('budget.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('budget.updated_at'), '%d-%b-%y'), 'updated_at']
         ],
@@ -58,7 +60,8 @@ module.exports = {
         {
           branch_id: req.body.branch_id,
           date: req.body.date + " 00:00:00",
-          hours: req.body.hours
+          hours: req.body.hours,
+          footer: req.body.footer
         })
         .then(result => {
           res.json(result);

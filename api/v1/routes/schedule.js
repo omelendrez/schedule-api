@@ -8,8 +8,9 @@ router.use(function(req, res, next) {
   next();
 });
 router.post("/", schedule.create);
+router.get("/", schedule.findAll);
 router.get("/:id", schedule.findById);
-router.get("/:id/budget", schedule.findByBudgetId);
+router.get("/:date/budget/:branch_id", schedule.findByBudget);
 router.put("/:id", schedule.update);
 router.delete("/:id", schedule.delete);
 
