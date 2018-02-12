@@ -12,6 +12,10 @@ module.exports = function(sequelize, DataTypes) {
     hours: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    footer: {
+      type: DataTypes.STRING,
+      allowNull: false
     }
   }, {
     indexes: [{

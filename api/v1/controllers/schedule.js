@@ -154,68 +154,77 @@ module.exports = {
     Schedule.belongsTo(Position);
     Schedule.belongsTo(Sector);
 
-    return Schedule
-      .findAndCountAll({
-        raw: true,
-        order: [
-          ['employee_id', 'ASC'],
-          ['from', 'ASC'],
-        ],
-        attributes: [
-          'id',
-          'from',
-          'to',
-          'employee_id'
-        ],
-        include: [
-          {
-            model: Budget,
-            where: {
-              id: sequelize.col('schedule.budget_id'),
-              date: req.params.date + " 00:00",
-              branch_id: req.params.branch_id
-            },
-            attributes: [
-            ]
-          },
-          {
-            model: Employee,
-            where: {
-              id: sequelize.col('schedule.employee_id')
-            },
-            attributes: [
-              'badge',
-              'first_name',
-              'last_name'
-            ]
-          },
-          {
-            model: Position,
-            where: {
-              id: sequelize.col('schedule.position_id')
-            },
-            attributes: [
-              'name',
-              'color'
-            ]
-          },
-          {
-            model: Sector,
-            where: {
-              id: sequelize.col('schedule.sector_id')
-            },
-            attributes: [
-              'name'
-            ]
-          }
-
-        ]
-
+    return Budget.findOne({
+      raw: true,
+      where: {
+        date: req.params.date + " 00:00",
+        branch_id: req.params.branch_id
+      },
+      attributes: [
+        'id',
+        'date',
+        'hours',
+        'footer'
+      ]
+    })
+      .then(budget => {
+        if (budget) {
+          Schedule
+            .findAndCountAll({
+              raw: true,
+              where: {
+                budget_id: budget.id
+              },
+              order: [
+                ['employee_id', 'ASC'],
+                ['from', 'ASC'],
+              ],
+              attributes: [
+                'id',
+                'from',
+                'to',
+                'employee_id'
+              ],
+              include: [
+                {
+                  model: Employee,
+                  where: {
+                    id: sequelize.col('schedule.employee_id')
+                  },
+                  attributes: [
+                    'first_name',
+                    'last_name'
+                  ]
+                },
+                {
+                  model: Position,
+                  where: {
+                    id: sequelize.col('schedule.position_id')
+                  },
+                  attributes: [
+                    'name',
+                    'color'
+                  ]
+                },
+                {
+                  model: Sector,
+                  where: {
+                    id: sequelize.col('schedule.sector_id')
+                  },
+                  attributes: [
+                    'name'
+                  ]
+                }
+              ]
+            })
+            .then(schedule => schedule ? res.json({ schedule: schedule, budget: { rows: budget, count: 1 } }) : res.json({ budget: { rows: budget, count: 1 }, schedule: { count: 0, rows: [] } }))
+            .catch(error => res.status(400).send(error));
+        } else {
+          res.json({ budget: { count: 0, rows: [] }, schedule: { count: 0, rows: [] } })
+        }
       })
-      .then(schedule => schedule ? res.json(schedule) : res.status(404).json({
-        "error": "Not found"
-      }))
       .catch(error => res.status(400).send(error));
+
   },
   update(req, res) {
     return Schedule
