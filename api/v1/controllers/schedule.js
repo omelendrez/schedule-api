@@ -148,11 +148,14 @@ module.exports = {
     const Employee = require("../models").employee;
     const Position = require("../models").position;
     const Sector = require("../models").sector;
+    const Branch = require("../models").branch;
 
     Schedule.belongsTo(Budget);
     Schedule.belongsTo(Employee);
     Schedule.belongsTo(Position);
     Schedule.belongsTo(Sector);
+
+    Budget.belongsTo(Branch);
 
     return Budget.findOne({
       raw: true,
@@ -167,6 +170,17 @@ module.exports = {
         'footer',
         'branch_id',
         [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), 'date']
+      ],
+      include: [
+        {
+          model: Branch,
+          where: {
+            id: sequelize.col('budget.branch_id')
+          },
+          attributes: [
+            'name'
+          ]
+        }
       ]
     })
       .then(budget => {
