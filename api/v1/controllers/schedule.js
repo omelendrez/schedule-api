@@ -1,10 +1,14 @@
 "use strict";
 const Schedule = require("../models").schedule;
 const sequelize = require("sequelize");
+const ERROR = 1;
+const WARNING = 2
+const OK = 0
 
 module.exports = {
   create(req, res) {
-    return Schedule
+
+    Schedule
       .create({
         budget_id: req.body.budget_id,
         employee_id: req.body.employee_id,
@@ -14,6 +18,27 @@ module.exports = {
         to: req.body.to
       })
       .then(schedule => res.status(201).json(schedule))
+      .catch(error => res.status(400).send(error));
+  },
+  verifyInput(req, res) {
+    Schedule
+      .findOne({
+        where: {
+          budget_id: req.body.budget_id,
+          employee_id: req.body.employee_id,
+          sector_id: req.body.sector_id,
+          position_id: req.body.position_id
+        }
+      })
+      .then((schedule) => {
+        res.json({
+          error: {
+            type: schedule && !req.body.id ? ERROR : 0,
+            schedule: schedule,
+            message: "Esta información ya existe en la base de datos"
+          }
+        })
+      })
       .catch(error => res.status(400).send(error));
   },
   findById(req, res) {
@@ -274,9 +299,9 @@ module.exports = {
           id: req.params.id
         }
       })
-      .then(Schedule => Schedule.destroy()
-        .then(result => {
-          res.status(204).json(result);
+      .then(schedule => schedule.destroy()
+        .then(() => {
+          res.json({ status: true });
         }))
       .catch(error => res.status(400).send(error));
   }
