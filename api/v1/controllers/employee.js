@@ -159,6 +159,28 @@ module.exports = {
       }))
       .catch(error => res.status(400).send(error));
   },
+  findByBranchId(req, res) {
+    return Employee
+      .findAndCountAll({
+        raw: true,
+        where: {
+          branch_id: req.params.id,
+          status_id: 1
+        },
+        attributes: [
+          'id',
+          'badge',
+          'first_name',
+          'last_name',
+          'sector_id'
+        ],
+        order: ['badge']
+      })
+      .then(employee => employee ? res.json(employee) : res.status(404).json({
+        "error": "Not found"
+      }))
+      .catch(error => res.status(400).send(error));
+  },
 
   delete(req, res) {
     return Employee
@@ -177,7 +199,6 @@ module.exports = {
         }))
       .catch(error => res.status(400).send(error));
   },
-
   update(req, res) {
     return Employee
       .findOne({
