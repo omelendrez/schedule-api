@@ -41,36 +41,43 @@ module.exports = {
             }
           })
         } else {
-          let query = `SELECT coalesce(sum(schedule.to-schedule.from),0)+${req.body.to - req.body.from} as hours FROM schedule WHERE budget_id = ${req.body.budget_id} AND employee_id = ${req.body.employee_id} LIMIT 1;`
+          let hours = 0
+          let query = `SELECT coalesce(sum(schedule.to-schedule.from),0) as hours FROM schedule WHERE id = ${req.body.id} LIMIT 1;`
           con.query(query, (err, schedule) => {
-            const hours = schedule[0].hours
-            if (parseInt(hours) < 8) {
-              res.json({
-                error: {
-                  type: WARNING,
-                  schedule: schedule,
-                  message: schedule ? "El empleado tiene menos de 4 horas trabajadas" : ""
-                }
-              })
-            } else {
-              if (parseInt(hours) > 8) {
+            if (schedule) {
+              hours = schedule[0].hours
+            }
+            let query = `SELECT coalesce(sum(schedule.to-schedule.from),0)+${(parseInt(req.body.to) - parseInt(req.body.from)) - hours} as hours FROM schedule WHERE budget_id = ${req.body.budget_id} AND employee_id = ${req.body.employee_id} LIMIT 1;`
+            con.query(query, (err, schedule) => {
+              const hours = schedule[0].hours
+              if (parseInt(hours) < 4) {
                 res.json({
                   error: {
                     type: WARNING,
                     schedule: schedule,
-                    message: schedule ? "El empleado tiene más de 8 horas trabajadas" : ""
+                    message: schedule ? "El empleado tiene menos de 4 horas trabajadas" : ""
                   }
                 })
               } else {
-                res.json({
-                  error: {
-                    type: OK,
-                    schedule: schedule,
-                    message: ""
-                  }
-                })
+                if (parseInt(hours) > 8) {
+                  res.json({
+                    error: {
+                      type: WARNING,
+                      schedule: schedule,
+                      message: schedule ? "El empleado tiene más de 8 horas trabajadas" : ""
+                    }
+                  })
+                } else {
+                  res.json({
+                    error: {
+                      type: OK,
+                      schedule: schedule,
+                      message: ""
+                    }
+                  })
+                }
               }
-            }
+            })
           })
         }
       })
