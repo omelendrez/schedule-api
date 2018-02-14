@@ -1,10 +1,15 @@
 "use strict";
 const Schedule = require("../models").schedule;
 const sequelize = require("sequelize");
+const Op = sequelize.Op
+const ERROR = 1;
+const WARNING = 2
+const OK = 0
 
 module.exports = {
   create(req, res) {
-    return Schedule
+
+    Schedule
       .create({
         budget_id: req.body.budget_id,
         employee_id: req.body.employee_id,
@@ -15,6 +20,68 @@ module.exports = {
       })
       .then(schedule => res.status(201).json(schedule))
       .catch(error => res.status(400).send(error));
+  },
+  verifyInput(req, res) {
+    const mysql = require('mysql2');
+    const con = mysql.createConnection({
+      host: "127.0.0.1",
+      user: "escng_schedule",
+      password: "M1a4$1t4E8r0",
+      database: "escng_schedule"
+    });
+    con.connect(() => {
+      let query = `SELECT id FROM schedule WHERE ((${req.body.from} between schedule.from and schedule.to) or (${req.body.to} between schedule.from+1 and schedule.to)) AND budget_id = ${req.body.budget_id} AND employee_id = ${req.body.employee_id} AND ${req.body.employee_id === 0} LIMIT 1;`
+      con.query(query, (err, schedule) => {
+        if (schedule.length) {
+          res.json({
+            error: {
+              type: ERROR,
+              schedule: schedule,
+              message: schedule ? "El empleado está ocupado en ese horario" : ""
+            }
+          })
+        } else {
+          let hours = 0
+          let query = `SELECT coalesce(sum(schedule.to-schedule.from),0) as hours FROM schedule WHERE id = ${req.body.id} LIMIT 1;`
+          con.query(query, (err, schedule) => {
+            if (schedule) {
+              hours = schedule[0].hours
+            }
+            let query = `SELECT coalesce(sum(schedule.to-schedule.from),0)+${(parseInt(req.body.to) - parseInt(req.body.from)) - hours} as hours FROM schedule WHERE budget_id = ${req.body.budget_id} AND employee_id = ${req.body.employee_id} LIMIT 1;`
+            con.query(query, (err, schedule) => {
+              const hours = schedule[0].hours
+              if (parseInt(hours) < 4) {
+                res.json({
+                  error: {
+                    type: WARNING,
+                    schedule: schedule,
+                    message: schedule ? "El empleado tiene menos de 4 horas trabajadas" : ""
+                  }
+                })
+              } else {
+                if (parseInt(hours) > 8) {
+                  res.json({
+                    error: {
+                      type: WARNING,
+                      schedule: schedule,
+                      message: schedule ? "El empleado tiene más de 8 horas trabajadas" : ""
+                    }
+                  })
+                } else {
+                  res.json({
+                    error: {
+                      type: OK,
+                      schedule: schedule,
+                      message: ""
+                    }
+                  })
+                }
+              }
+            })
+          })
+        }
+      })
+    })
   },
   findById(req, res) {
     const Budget = require("../models").budget;
@@ -194,6 +261,7 @@ module.exports = {
               order: [
                 ['employee_id', 'ASC'],
                 ['from', 'ASC'],
+                ['to', 'ASC'],
               ],
               attributes: [
                 'id',
@@ -202,8 +270,8 @@ module.exports = {
                 'employee_id',
                 'sector_id',
                 'position_id',
-                [sequelize.fn('date_format', sequelize.col('sector.created_at'), '%d-%b-%y'), 'created_at'],
-                [sequelize.fn('date_format', sequelize.col('sector.updated_at'), '%d-%b-%y'), 'updated_at']
+                [sequelize.fn('date_format', sequelize.col('schedule.created_at'), '%d-%b-%y'), 'created_at'],
+                [sequelize.fn('date_format', sequelize.col('schedule.updated_at'), '%d-%b-%y'), 'updated_at']
               ],
               include: [
                 {
@@ -274,9 +342,9 @@ module.exports = {
           id: req.params.id
         }
       })
-      .then(Schedule => Schedule.destroy()
-        .then(result => {
-          res.status(204).json(result);
+      .then(schedule => schedule.destroy()
+        .then(() => {
+          res.json({ status: true });
         }))
       .catch(error => res.status(400).send(error));
   }

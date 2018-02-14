@@ -6,31 +6,31 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     mo: {
-      type: DataTypes.CHAR(4),
+      type: DataTypes.CHAR(11),
       allowNull: false
     },
     tu: {
-      type: DataTypes.CHAR(4),
+      type: DataTypes.CHAR(11),
       allowNull: false
     },
     we: {
-      type: DataTypes.CHAR(4),
+      type: DataTypes.CHAR(11),
       allowNull: false
     },
     th: {
-      type: DataTypes.CHAR(4),
+      type: DataTypes.CHAR(11),
       allowNull: false
     },
     fr: {
-      type: DataTypes.CHAR(4),
+      type: DataTypes.CHAR(11),
       allowNull: false
     },
     sa: {
-      type: DataTypes.CHAR(4),
+      type: DataTypes.CHAR(11),
       allowNull: false
     },
     su: {
-      type: DataTypes.CHAR(4),
+      type: DataTypes.CHAR(11),
       allowNull: false
     }
   });
