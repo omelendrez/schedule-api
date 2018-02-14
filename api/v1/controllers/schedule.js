@@ -1,6 +1,7 @@
 "use strict";
 const Schedule = require("../models").schedule;
 const sequelize = require("sequelize");
+const Op = sequelize.Op
 const ERROR = 1;
 const WARNING = 2
 const OK = 0
@@ -21,25 +22,59 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
   verifyInput(req, res) {
-    Schedule
-      .findOne({
-        where: {
-          budget_id: req.body.budget_id,
-          employee_id: req.body.employee_id,
-          sector_id: req.body.sector_id,
-          position_id: req.body.position_id
+    const mysql = require('mysql2');
+    const con = mysql.createConnection({
+      host: "127.0.0.1",
+      user: "escng_schedule",
+      password: "M1a4$1t4E8r0",
+      database: "escng_schedule"
+    });
+    con.connect(() => {
+      let query = `SELECT id FROM schedule WHERE ((${req.body.from} between schedule.from and schedule.to) or (${req.body.to} between schedule.from+1 and schedule.to)) AND budget_id = ${req.body.budget_id} AND employee_id = ${req.body.employee_id} AND ${req.body.employee_id === 0} LIMIT 1;`
+      con.query(query, (err, schedule) => {
+        if (schedule.length) {
+          res.json({
+            error: {
+              type: ERROR,
+              schedule: schedule,
+              message: schedule ? "El empleado está ocupado en ese horario" : ""
+            }
+          })
+        } else {
+          let query = `SELECT coalesce(sum(schedule.to-schedule.from),0)+${req.body.to - req.body.from} as hours FROM schedule WHERE budget_id = ${req.body.budget_id} AND employee_id = ${req.body.employee_id} LIMIT 1;`
+          con.query(query, (err, schedule) => {
+            const hours = schedule[0].hours
+            if (parseInt(hours) < 8) {
+              res.json({
+                error: {
+                  type: WARNING,
+                  schedule: schedule,
+                  message: schedule ? "El empleado tiene menos de 4 horas trabajadas" : ""
+                }
+              })
+            } else {
+              if (parseInt(hours) > 8) {
+                res.json({
+                  error: {
+                    type: WARNING,
+                    schedule: schedule,
+                    message: schedule ? "El empleado tiene más de 8 horas trabajadas" : ""
+                  }
+                })
+              } else {
+                res.json({
+                  error: {
+                    type: OK,
+                    schedule: schedule,
+                    message: ""
+                  }
+                })
+              }
+            }
+          })
         }
       })
-      .then((schedule) => {
-        res.json({
-          error: {
-            type: schedule && !req.body.id ? ERROR : 0,
-            schedule: schedule,
-            message: "Esta información ya existe en la base de datos"
-          }
-        })
-      })
-      .catch(error => res.status(400).send(error));
+    })
   },
   findById(req, res) {
     const Budget = require("../models").budget;
@@ -219,6 +254,7 @@ module.exports = {
               order: [
                 ['employee_id', 'ASC'],
                 ['from', 'ASC'],
+                ['to', 'ASC'],
               ],
               attributes: [
                 'id',
@@ -227,8 +263,8 @@ module.exports = {
                 'employee_id',
                 'sector_id',
                 'position_id',
-                [sequelize.fn('date_format', sequelize.col('sector.created_at'), '%d-%b-%y'), 'created_at'],
-                [sequelize.fn('date_format', sequelize.col('sector.updated_at'), '%d-%b-%y'), 'updated_at']
+                [sequelize.fn('date_format', sequelize.col('schedule.created_at'), '%d-%b-%y'), 'created_at'],
+                [sequelize.fn('date_format', sequelize.col('schedule.updated_at'), '%d-%b-%y'), 'updated_at']
               ],
               include: [
                 {
