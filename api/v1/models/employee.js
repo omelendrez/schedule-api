@@ -17,14 +17,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    position_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    sector_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     joining_date: {
       type: DataTypes.DATEONLY,
       allowNull: false

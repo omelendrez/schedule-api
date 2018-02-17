@@ -10,8 +10,6 @@ module.exports = {
         last_name: req.body.last_name,
         first_name: req.body.first_name,
         joining_date: req.body.joining_date,
-        position_id: req.body.position_id,
-        sector_id: req.body.sector_id,
         branch_id: req.body.branch_id,
         status_id: 1
       })
@@ -21,13 +19,9 @@ module.exports = {
 
   findAll(req, res) {
     const Status = require("../models").status;
-    const Sector = require("../models").sector;
-    const Position = require("../models").position;
     const Branch = require("../models").branch;
 
     Employee.belongsTo(Status);
-    Employee.belongsTo(Sector);
-    Employee.belongsTo(Position);
     Employee.belongsTo(Branch);
 
     const page = parseInt(req.query.page ? req.query.page : 0);
@@ -64,24 +58,6 @@ module.exports = {
             ]
           },
           {
-            model: Sector,
-            where: {
-              id: sequelize.col('employee.sector_id')
-            },
-            attributes: [
-              'name'
-            ]
-          },
-          {
-            model: Position,
-            where: {
-              id: sequelize.col('employee.position_id')
-            },
-            attributes: [
-              'name'
-            ]
-          },
-          {
             model: Branch,
             where: {
               id: sequelize.col('employee.branch_id')
@@ -99,8 +75,6 @@ module.exports = {
           'badge',
           'status_id',
           'branch_id',
-          'sector_id',
-          'position_id',
           [sequelize.fn('date_format', sequelize.col('employee.joining_date'), '%Y-%m-%d'), 'joining_date'],
           [sequelize.fn('date_format', sequelize.col('employee.joining_date'), '%d-%b-%y'), '_joining_date'],
           [sequelize.fn('date_format', sequelize.col('employee.created_at'), '%d-%b-%y'), 'created_at'],
@@ -113,13 +87,9 @@ module.exports = {
 
   findById(req, res) {
     const Status = require("../models").status;
-    const Sector = require("../models").sector;
-    const Position = require("../models").position;
     const Branch = require("../models").branch;
 
     Employee.belongsTo(Status);
-    Employee.belongsTo(Sector);
-    Employee.belongsTo(Position);
     Employee.belongsTo(Branch);
 
     return Employee
@@ -132,18 +102,6 @@ module.exports = {
             model: Status,
             where: {
               id: sequelize.col('employee.status_id')
-            }
-          },
-          {
-            model: Sector,
-            where: {
-              id: sequelize.col('employee.sector_id')
-            }
-          },
-          {
-            model: Position,
-            where: {
-              id: sequelize.col('employee.position_id')
             }
           },
           {
@@ -211,9 +169,7 @@ module.exports = {
           badge: req.body.badge,
           last_name: req.body.last_name,
           first_name: req.body.first_name,
-          joining_date: req.body.joining_date + " 00:00:00",
-          position_id: req.body.position_id,
-          sector_id: req.body.sector_id,
+          joining_date: req.body.joining_date,
           branch_id: req.body.branch_id
         })
         .then(result => {
