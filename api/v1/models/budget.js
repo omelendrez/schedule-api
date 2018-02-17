@@ -1,12 +1,12 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Budget = sequelize.define("budget", {
     branch_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
     date: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false
     },
     hours: {
@@ -17,12 +17,13 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     }
-  }, {
-    indexes: [{
-      unique: true,
-      fields: ["date"]
-    }]
-  });
+  }, 
+    {
+      indexes: [{
+        unique: true,
+        fields: ["date", "branch_id"]
+      }]
+    });
 
   return Budget;
 };
