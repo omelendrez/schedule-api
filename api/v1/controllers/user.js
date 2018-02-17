@@ -1,17 +1,44 @@
 "use strict";
 const User = require("../models").user;
 const sequelize = require("sequelize");
+const Op = sequelize.Op
+
+const errorMessage = [
+  {
+    key: "inUse",
+    value: "Ese nombre de usuario ya está asignado a otro usuario"
+  }
+]
+
+const findMessage = ((key) => {
+  const result = errorMessage.find(item => {
+    return item.key === key
+  })
+  return result.value
+})
 
 module.exports = {
   create(req, res) {
-    return User
-      .create({
-        user_name: req.body.user_name,
-        full_name: req.body.full_name,
-        profile_id: req.body.profile_id
+
+    User.findOne({
+      where: {
+        user_name: req.body.user_name
+      }
+    })
+      .then(user => {
+        if (user) {
+          res.json({ error: true, message: findMessage("inUse") })
+        } else {
+          User
+            .create({
+              user_name: req.body.user_name,
+              full_name: req.body.full_name,
+              profile_id: req.body.profile_id
+            })
+            .then(user => res.status(201).json(user))
+            .catch(error => res.status(400).send(error));
+        }
       })
-      .then(user => res.status(201).json(user))
-      .catch(error => res.status(400).send(error));
   },
 
   findAll(req, res) {
@@ -124,29 +151,44 @@ module.exports = {
       .then(user => user.update({
         status_id: user.status_id === 1 ? 2 : 1
       })
-        .then(result => {
-          res.json(result);
+        .then(() => {
+          res.json({ status: true });
         }))
       .catch(error => res.status(400).send(error));
   },
 
   update(req, res) {
-    return User
-      .findOne({
-        where: {
-          id: req.params.id
+
+    User.findOne({
+      where: {
+        user_name: req.body.user_name,
+        id: {
+          [Op.ne]: req.body.id
+        }
+      }
+    })
+      .then(user => {
+        if (user) {
+          res.json({ error: true, message: findMessage("inUse") })
+        } else {
+          User
+            .findOne({
+              where: {
+                id: req.params.id
+              }
+            })
+            .then(user => user.update(
+              {
+                user_name: req.body.user_name,
+                full_name: req.body.full_name,
+                profile_id: req.body.profile_id
+              })
+              .then(result => {
+                res.json(result);
+              }))
+            .catch(error => res.status(400).send(error));
         }
       })
-      .then(user => user.update(
-        {
-          user_name: req.body.user_name,
-          full_name: req.body.full_name,
-          profile_id: req.body.profile_id
-        })
-        .then(result => {
-          res.json(result);
-        }))
-      .catch(error => res.status(400).send(error));
   },
   changePassword(req, res) {
     return User
