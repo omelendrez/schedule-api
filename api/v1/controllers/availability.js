@@ -5,24 +5,15 @@ const sequelize = require("sequelize");
 module.exports = {
   create(req, res) {
     const employee_id = req.body.employee_id;
-    const mo = req.body.mo;
-    const tu = req.body.tu;
-    const we = req.body.we;
-    const th = req.body.th;
-    const fr = req.body.fr;
-    const sa = req.body.sa;
-    const su = req.body.su;
-
+    const week_day = req.body.week_day;
+    const from = req.body.from;
+    const to = req.body.to;
     return Availability
       .create({
         employee_id: employee_id,
-        mo: mo,
-        tu: tu,
-        we: we,
-        th: th,
-        fr: fr,
-        sa: sa,
-        su: su
+        week_day: week_day,
+        from: from,
+        to: to
       })
       .then(availability => res.status(201).json(availability))
       .catch(error => res.status(400).json(error));
@@ -48,14 +39,8 @@ module.exports = {
         }],
         attributes: [
           'id',
-          'mo',
-          'tu',
-          'we',
-          'th',
-          'fr',
-          'sa',
-          'su',
           'employee_id',
+          'week_day',
           [sequelize.fn('date_format', sequelize.col('availability.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('availability.updated_at'), '%d-%b-%y'), 'updated_at']
         ]
@@ -100,13 +85,9 @@ module.exports = {
       .then(branch => branch.update(
         {
           employee_id: req.body.employee_id,
-          mo: req.body.mo,
-          tu: req.body.tu,
-          we: req.body.we,
-          th: req.body.th,
-          fr: req.body.fr,
-          sa: req.body.sa,
-          su: req.body.su
+          week_day: req.body.week_day,
+          from: req.body.from,
+          to: req.body.to
         })
         .then(result => {
           res.json(result);

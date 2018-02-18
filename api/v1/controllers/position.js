@@ -65,7 +65,32 @@ module.exports = {
       .findAndCountAll({
         where: {
           sector_id: req.params.id
-        },
+        }
+      })
+      .then(position => position ? res.json(position) : res.status(404).json({
+        "error": "Not found"
+      }))
+      .catch(error => res.status(400).send(error));
+  },
+  findAllWithSectors(req, res) {
+    const Sector = require("../models").sector;
+    Position.belongsTo(Sector);
+    return Position
+      .findAndCountAll({
+        raw: true,
+        attributes: [
+          'id',
+          'name'
+        ],
+        include: [{
+          model: Sector,
+          where: {
+            id: sequelize.col('position.sector_id')
+          },
+          attributes: [
+            'name'
+          ]
+        }],
       })
       .then(position => position ? res.json(position) : res.status(404).json({
         "error": "Not found"
