@@ -57,6 +57,7 @@ module.exports = {
           [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), '_date'],
           'hours',
           'footer',
+          [sequelize.fn('weekday', sequelize.col('date')), 'weekday'],
           [sequelize.fn('date_format', sequelize.col('budget.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('budget.updated_at'), '%d-%b-%y'), 'updated_at']
         ],

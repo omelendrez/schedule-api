@@ -107,7 +107,9 @@ module.exports = {
               id: sequelize.col('schedule.budget_id')
             },
             attributes: [
-              'date'
+              'date',
+              [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), '_date'],
+              [sequelize.fn('weekday', sequelize.col('date')), 'weekday']
             ]
           },
           {
@@ -169,7 +171,9 @@ module.exports = {
               id: sequelize.col('schedule.budget_id')
             },
             attributes: [
-              'date'
+              'date',
+              [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), '_date'],
+              [sequelize.fn('weekday', sequelize.col('date')), 'weekday']
             ]
           },
           {
@@ -227,16 +231,18 @@ module.exports = {
     return Budget.findOne({
       raw: true,
       where: {
-        date: req.params.date + " 00:00",
+        date: req.params.date,
         branch_id: req.params.branch_id
       },
       attributes: [
         'id',
         'date',
+        [sequelize.fn('weekday', sequelize.col('date')), 'weekday'],
+        [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), '_date'],
         'hours',
         'footer',
         'branch_id',
-        [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), 'date']
+        [sequelize.fn('date_format', sequelize.col('date'), '%d-%m-%Y'), 'date']
       ],
       include: [
         {
