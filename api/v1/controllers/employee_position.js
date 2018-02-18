@@ -8,7 +8,6 @@ module.exports = {
     return EmployeePosition
       .create({
         employee_id: req.body.employee_id,
-        sector_id: req.body.sector_id,
         position_id: req.body.position_id
       })
       .then(employee => res.status(201).json(employee))
@@ -58,19 +57,16 @@ module.exports = {
       .then(budget => res.json(budget))
       .catch(error => res.status(400).send(error));
   },
-  update(req, res) {
+  delete(req, res) {
     EmployeePosition
       .findOne({
         where: {
           id: req.params.id
         }
       })
-      .then(employeePosition => employeePosition.update(
-        {
-          active: req.body.active
-        })
-        .then(result => {
-          res.json(result);
+      .then(employeePosition => employeePosition.destroy()
+        .then(() => {
+          res.json({ success: true });
         }))
       .catch(error => res.status(400).send(error));
   }

@@ -17,7 +17,7 @@ models.sequelize.sync({
   force: false
 });
 /*
-models.employee_position.sequelize.sync({
+models.availability.sequelize.sync({
   force: true
 });
 */

@@ -1,10 +1,12 @@
 "use strict";
 const Employee = require("../models").employee;
+const EmployeePosition = require("../models").employee_position;
+const Availability = require("../models").availability;
 const sequelize = require("sequelize");
 
 module.exports = {
   create(req, res) {
-    return Employee
+    Employee
       .create({
         badge: req.body.badge,
         last_name: req.body.last_name,
@@ -13,8 +15,42 @@ module.exports = {
         branch_id: req.body.branch_id,
         status_id: 1
       })
-      .then(employee => res.status(201).json(employee))
+      .then(employee => {
+        const pos = req.body.selectedPositions
+        let data = []
+        for (let i = 0; i < pos.length; i++) {
+          let record = {}
+          record.employee_id = employee.id
+          record.position_id = pos[i]
+          data.push(record)
+        }
+        EmployeePosition
+          .bulkCreate(data)
+          .then(() => {
+            const _body = req.body
+            data = []
+            for (var prop in _body) {
+              if (_body.hasOwnProperty(prop)) {
+                if (prop.substring(0, 3) === "fld" && prop.indexOf("from") > 0) {
+                  const fld = prop.split("_")
+                  let record = {}
+                  record.employee_id = employee.id
+                  record.week_day = fld[1]
+                  record[fld[2]] = req.body[prop];
+                  record.to = req.body["fld_" + fld[1] + "_to"];
+                  data.push(record)
+                }
+              }
+            }
+            Availability
+              .bulkCreate(data)
+              .then(() => {
+                res.status(201).json(employee)
+              })
+          })
+      })
       .catch(error => res.status(400).send(error));
+
   },
 
   findAll(req, res) {
@@ -66,6 +102,7 @@ module.exports = {
               'name'
             ]
           }
+
         ],
         attributes: [
           'id',
@@ -88,9 +125,13 @@ module.exports = {
   findById(req, res) {
     const Status = require("../models").status;
     const Branch = require("../models").branch;
+    const Availability = require("../models").availability;
+    const EmployeePosition = require("../models").employee_position;
 
     Employee.belongsTo(Status);
     Employee.belongsTo(Branch);
+    Employee.hasMany(Availability);
+    Employee.hasMany(EmployeePosition);
 
     return Employee
       .findOne({
@@ -102,13 +143,39 @@ module.exports = {
             model: Status,
             where: {
               id: sequelize.col('employee.status_id')
-            }
+            },
+            attributes: [
+              'name'
+            ]
           },
           {
             model: Branch,
             where: {
               id: sequelize.col('employee.branch_id')
-            }
+            },
+            attributes: [
+              'name'
+            ]
+          },
+          {
+            model: Availability,
+            where: {
+              id: sequelize.col('employee.id')
+            },
+            attributes: [
+              'week_day',
+              'from',
+              'to'
+            ]
+          },
+          {
+            model: EmployeePosition,
+            where: {
+              id: sequelize.col('employee.id')
+            },
+            attributes: [
+              'position_id'
+            ]
           }
         ]
       })
@@ -173,8 +240,55 @@ module.exports = {
           branch_id: req.body.branch_id
         })
         .then(result => {
-          res.json(result);
+          const employeeId = req.params.id
+          EmployeePosition.destroy({
+            where: {
+              employee_id: employeeId
+            }
+          })
+            .then(() => {
+              const pos = req.body.selectedPositions
+              let data = []
+              for (let i = 0; i < pos.length; i++) {
+                let record = {}
+                record.employee_id = employee.id
+                record.position_id = pos[i]
+                data.push(record)
+              }
+              EmployeePosition
+                .bulkCreate(data)
+                .then(() => {
+                  Availability.destroy({
+                    where: {
+                      employee_id: employee.id
+                    }
+                  })
+                    .then(() => {
+                      const _body = req.body
+                      data = []
+                      for (var prop in _body) {
+                        if (_body.hasOwnProperty(prop)) {
+                          if (prop.substring(0, 3) === "fld" && prop.indexOf("from") > 0) {
+                            const fld = prop.split("_")
+                            let record = {}
+                            record.employee_id = employee.id
+                            record.week_day = fld[1]
+                            record[fld[2]] = req.body[prop];
+                            record.to = req.body["fld_" + fld[1] + "_to"];
+                            data.push(record)
+                          }
+                        }
+                      }
+                      Availability
+                        .bulkCreate(data)
+                        .then(() => {
+                          res.status(201).json(result)
+                        })
+                    })
+                })
+
+            })
+            .catch(error => res.status(400).send(error));
         }))
-      .catch(error => res.status(400).send(error));
   }
-};
+}
