@@ -4,7 +4,7 @@ const sequelize = require("sequelize");
 
 module.exports = {
   create(req, res) {
-    const name = req.body.name;
+    const name = req.body.name.charAt(0).toUpperCase() + req.body.name.slice(1);
     const status_id = req.body.status_id;
 
     return Branch
@@ -60,6 +60,7 @@ module.exports = {
   },
 
   update(req, res) {
+    const name = req.body.name.charAt(0).toUpperCase() + req.body.name.slice(1);
     return Branch
       .findOne({
         where: {
@@ -68,7 +69,7 @@ module.exports = {
       })
       .then(branch => branch.update(
         {
-          name: req.body.name
+          name: name
         })
         .then(result => {
           res.json(result);

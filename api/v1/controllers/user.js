@@ -9,17 +9,14 @@ const errorMessage = [
     value: "Ese nombre de usuario ya está asignado a otro usuario"
   }
 ]
-
 const findMessage = ((key) => {
   const result = errorMessage.find(item => {
     return item.key === key
   })
   return result.value
 })
-
 module.exports = {
   create(req, res) {
-
     User.findOne({
       where: {
         user_name: req.body.user_name
@@ -29,10 +26,14 @@ module.exports = {
         if (user) {
           res.json({ error: true, message: findMessage("inUse") })
         } else {
+          const fullName = req.body.full_name.split(" ")
+          for (let i = 0; i < fullName.length; i++) {
+            fullName[i] = fullName[i].charAt(0).toUpperCase() + fullName[i].slice(1)
+          }
           User
             .create({
               user_name: req.body.user_name,
-              full_name: req.body.full_name,
+              full_name: fullName.join(" "),
               profile_id: req.body.profile_id
             })
             .then(user => res.status(201).json(user))
@@ -171,6 +172,10 @@ module.exports = {
         if (user) {
           res.json({ error: true, message: findMessage("inUse") })
         } else {
+          const fullName = req.body.full_name.split(" ")
+          for (let i = 0; i < fullName.length; i++) {
+            fullName[i] = fullName[i].charAt(0).toUpperCase() + fullName[i].slice(1)
+          }
           User
             .findOne({
               where: {
@@ -180,7 +185,7 @@ module.exports = {
             .then(user => user.update(
               {
                 user_name: req.body.user_name,
-                full_name: req.body.full_name,
+                full_name: fullName.join(" "),
                 profile_id: req.body.profile_id
               })
               .then(result => {
