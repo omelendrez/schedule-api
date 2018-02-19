@@ -4,9 +4,10 @@ const sequelize = require("sequelize");
 
 module.exports = {
   create(req, res) {
+    const name = req.body.name.charAt(0).toUpperCase() + req.body.name.slice(1);
     return sector
       .create({
-        name: req.body.name
+        name: name
       })
       .then(sector => res.status(201).send(sector))
       .catch(error => res.status(400).send(error));
@@ -59,6 +60,7 @@ module.exports = {
   },
 
   update(req, res) {
+    const name = req.body.name.charAt(0).toUpperCase() + req.body.name.slice(1);
     return sector
       .findOne({
         where: {
@@ -66,7 +68,7 @@ module.exports = {
         }
       })
       .then(sector => sector.update({
-        name: req.body.name
+        name: name
       })
         .then(result => {
           res.json(result);

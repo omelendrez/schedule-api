@@ -5,9 +5,10 @@ const sequelize = require("sequelize");
 module.exports = {
 
   create(req, res) {
+    const name = req.body.name.charAt(0).toUpperCase() + req.body.name.slice(1);
     return Position
       .create({
-        name: req.body.name,
+        name: name,
         sector_id: req.body.sector_id,
         color: req.body.color
       })
@@ -112,6 +113,7 @@ module.exports = {
   },
 
   update(req, res) {
+    const name = req.body.name.charAt(0).toUpperCase() + req.body.name.slice(1);
     return Position
       .findOne({
         where: {
@@ -120,7 +122,7 @@ module.exports = {
       })
       .then(position => position.update(
         {
-          name: req.body.name,
+          name: name,
           sector_id: req.body.sector_id,
           color: req.body.color
         })

@@ -6,11 +6,14 @@ const sequelize = require("sequelize");
 
 module.exports = {
   create(req, res) {
+    const badge = req.body.badge.toUpperCase()
+    const last_name = req.body.last_name.charAt(0).toUpperCase() + req.body.last_name.slice(1)
+    const first_name = req.body.first_name.charAt(0).toUpperCase() + req.body.first_name.slice(1)
     Employee
       .create({
-        badge: req.body.badge,
-        last_name: req.body.last_name,
-        first_name: req.body.first_name,
+        badge: badge,
+        last_name: last_name,
+        first_name: first_name,
         joining_date: req.body.joining_date,
         branch_id: req.body.branch_id,
         status_id: 1
@@ -196,8 +199,7 @@ module.exports = {
           'id',
           'badge',
           'first_name',
-          'last_name',
-          'sector_id'
+          'last_name'
         ],
         order: ['badge']
       })
@@ -225,6 +227,9 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
   update(req, res) {
+    const badge = req.body.badge.toUpperCase()
+    const last_name = req.body.last_name.charAt(0).toUpperCase() + req.body.last_name.slice(1)
+    const first_name = req.body.first_name.charAt(0).toUpperCase() + req.body.first_name.slice(1)
     return Employee
       .findOne({
         where: {
@@ -233,9 +238,9 @@ module.exports = {
       })
       .then(employee => employee.update(
         {
-          badge: req.body.badge,
-          last_name: req.body.last_name,
-          first_name: req.body.first_name,
+          badge: badge,
+          last_name: last_name,
+          first_name: first_name,
           joining_date: req.body.joining_date,
           branch_id: req.body.branch_id
         })

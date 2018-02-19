@@ -286,6 +286,7 @@ module.exports = {
                     id: sequelize.col('schedule.employee_id')
                   },
                   attributes: [
+                    'badge',
                     'first_name',
                     'last_name'
                   ]
