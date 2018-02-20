@@ -20,7 +20,7 @@ module.exports = function (sequelize, DataTypes) {
   },
     {
       indexes: [{
-        fields: ["employee_id", "week_day"]
+        fields: ["employee_id"]
       }]
     });
 
