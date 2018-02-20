@@ -1,6 +1,7 @@
 "use strict";
 const Schedule = require("../models").schedule;
 const sequelize = require("sequelize");
+
 const ERROR = 1;
 const WARNING = 2;
 const OK = 0;
@@ -19,11 +20,17 @@ module.exports = {
   },
   verifyInput(req, res) {
     const mysql = require("mysql2");
+    const path = require("path");
+    const env = process.env.NODE_ENV || "development";
+    const config = require(path.join(__dirname, "..", "config", "config.json"))[
+      env
+    ];
+
     const con = mysql.createConnection({
-      host: "127.0.0.1",
-      user: "escng_schedule",
-      password: "M1a4$1t4E8r0",
-      database: "escng_schedule"
+      host: config.host,
+      user: config.username,
+      password: config.password,
+      database: config.database
     });
     con.connect(() => {
       let query = `SELECT id FROM schedule WHERE ((${
@@ -32,7 +39,7 @@ module.exports = {
         req.body.to
       } between schedule.from+1 and schedule.to)) AND budget_id = ${
         req.body.budget_id
-      } AND employee_id = ${req.body.employee_id} AND ${req.body.employee_id ===
+      } AND employee_id = ${req.body.employee_id} AND ${req.body.employee_id !==
         0} LIMIT 1;`;
       con.query(query, (err, schedule) => {
         if (schedule.length) {
@@ -67,7 +74,7 @@ module.exports = {
                     type: WARNING,
                     schedule: schedule,
                     message: schedule
-                      ? "El empleado tiene menos de 4 horas trabajadas"
+                      ? `El empleado tiene menos de 4 horas trabajadas (${hours} horas)`
                       : ""
                   }
                 });
@@ -78,7 +85,7 @@ module.exports = {
                       type: WARNING,
                       schedule: schedule,
                       message: schedule
-                        ? "El empleado tiene más de 8 horas trabajadas"
+                        ? `El empleado tiene más de 8 horas trabajadas (${hours} horas)`
                         : ""
                     }
                   });
@@ -97,113 +104,6 @@ module.exports = {
         }
       });
     });
-  },
-  findById(req, res) {
-    const Budget = require("../models").budget;
-    const Employee = require("../models").employee;
-    const Position = require("../models").position;
-
-    Schedule.belongsTo(Budget);
-    Schedule.belongsTo(Employee);
-    Schedule.belongsTo(Position);
-
-    return Schedule.findOne({
-      raw: true,
-      where: {
-        id: req.params.id
-      },
-      include: [
-        {
-          model: Budget,
-          where: {
-            id: sequelize.col("schedule.budget_id")
-          },
-          attributes: [
-            "date",
-            [
-              sequelize.fn("date_format", sequelize.col("date"), "%Y-%m-%d"),
-              "_date"
-            ],
-            [sequelize.fn("weekday", sequelize.col("date")), "weekday"]
-          ]
-        },
-        {
-          model: Employee,
-          where: {
-            id: sequelize.col("schedule.employee_id")
-          },
-          attributes: ["badge", "first_name", "last_name"]
-        },
-        {
-          model: Position,
-          where: {
-            id: sequelize.col("schedule.position_id")
-          },
-          attributes: ["name"]
-        }
-      ]
-    })
-      .then(
-        schedule =>
-          schedule
-            ? res.json(schedule)
-            : res.status(404).json({
-                error: "Not found"
-              })
-      )
-      .catch(error => res.status(400).send(error));
-  },
-  findAll(req, res) {
-    const Budget = require("../models").budget;
-    const Employee = require("../models").employee;
-    const Position = require("../models").position;
-
-    Schedule.belongsTo(Budget);
-    Schedule.belongsTo(Employee);
-    Schedule.belongsTo(Position);
-
-    return Schedule.findAndCountAll({
-      raw: true,
-      include: [
-        {
-          model: Budget,
-          where: {
-            id: sequelize.col("schedule.budget_id")
-          },
-          attributes: [
-            "date",
-            [
-              sequelize.fn("date_format", sequelize.col("date"), "%Y-%m-%d"),
-              "_date"
-            ],
-            [sequelize.fn("weekday", sequelize.col("date")), "weekday"]
-          ]
-        },
-        {
-          model: Employee,
-          where: {
-            id: sequelize.col("schedule.employee_id")
-          },
-          attributes: ["badge", "first_name", "last_name"]
-        },
-        {
-          model: Position,
-          where: {
-            id: sequelize.col("schedule.position_id")
-          },
-          attributes: ["name"]
-        }
-      ]
-    })
-      .then(
-        schedule =>
-          schedule
-            ? res.json(schedule)
-            : res.status(404).json({
-                error: "Not found"
-              })
-      )
-      .catch(error => res.status(400).send(error));
   },
   findByBudget(req, res) {
     const Budget = require("../models").budget;
@@ -298,7 +198,7 @@ module.exports = {
                   {
                     model: Sector,
                     where: {
-                      id:sequelize.col("position.sector_id")
+                      id: sequelize.col("position.sector_id")
                     },
                     attributes: ["name"]
                   }
@@ -334,8 +234,8 @@ module.exports = {
         id: req.params.id
       }
     })
-      .then(timeoff =>
-        timeoff
+      .then(schedule =>
+        schedule
           .update({
             budget_id: req.body.budget_id,
             employee_id: req.body.employee_id,
