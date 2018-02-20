@@ -1,7 +1,6 @@
 "use strict";
 const Schedule = require("../models").schedule;
 const sequelize = require("sequelize");
-const Op = sequelize.Op
 const ERROR = 1;
 const WARNING = 2
 const OK = 0
@@ -13,7 +12,6 @@ module.exports = {
       .create({
         budget_id: req.body.budget_id,
         employee_id: req.body.employee_id,
-        sector_id: req.body.sector_id,
         position_id: req.body.position_id,
         from: req.body.from,
         to: req.body.to
@@ -87,12 +85,10 @@ module.exports = {
     const Budget = require("../models").budget;
     const Employee = require("../models").employee;
     const Position = require("../models").position;
-    const Sector = require("../models").sector;
 
     Schedule.belongsTo(Budget);
     Schedule.belongsTo(Employee);
     Schedule.belongsTo(Position);
-    Schedule.belongsTo(Sector);
 
     return Schedule
       .findOne({
@@ -131,17 +127,7 @@ module.exports = {
             attributes: [
               'name'
             ]
-          },
-          {
-            model: Sector,
-            where: {
-              id: sequelize.col('schedule.sector_id')
-            },
-            attributes: [
-              'name'
-            ]
           }
-
         ]
 
       })
@@ -154,12 +140,10 @@ module.exports = {
     const Budget = require("../models").budget;
     const Employee = require("../models").employee;
     const Position = require("../models").position;
-    const Sector = require("../models").sector;
 
     Schedule.belongsTo(Budget);
     Schedule.belongsTo(Employee);
     Schedule.belongsTo(Position);
-    Schedule.belongsTo(Sector);
 
     return Schedule
       .findAndCountAll({
@@ -195,19 +179,8 @@ module.exports = {
             attributes: [
               'name'
             ]
-          },
-          {
-            model: Sector,
-            where: {
-              id: sequelize.col('schedule.sector_id')
-            },
-            attributes: [
-              'name'
-            ]
           }
-
         ]
-
       })
       .then(schedule => schedule ? res.json(schedule) : res.status(404).json({
         "error": "Not found"
@@ -218,13 +191,11 @@ module.exports = {
     const Budget = require("../models").budget;
     const Employee = require("../models").employee;
     const Position = require("../models").position;
-    const Sector = require("../models").sector;
     const Branch = require("../models").branch;
 
     Schedule.belongsTo(Budget);
     Schedule.belongsTo(Employee);
     Schedule.belongsTo(Position);
-    Schedule.belongsTo(Sector);
 
     Budget.belongsTo(Branch);
 
@@ -274,7 +245,6 @@ module.exports = {
                 'from',
                 'to',
                 'employee_id',
-                'sector_id',
                 'position_id',
                 [sequelize.fn('date_format', sequelize.col('schedule.created_at'), '%d-%b-%y'), 'created_at'],
                 [sequelize.fn('date_format', sequelize.col('schedule.updated_at'), '%d-%b-%y'), 'updated_at']
@@ -300,15 +270,6 @@ module.exports = {
                     'name',
                     'color'
                   ]
-                },
-                {
-                  model: Sector,
-                  where: {
-                    id: sequelize.col('schedule.sector_id')
-                  },
-                  attributes: [
-                    'name'
-                  ]
                 }
               ]
             })
@@ -332,7 +293,6 @@ module.exports = {
         {
           budget_id: req.body.budget_id,
           employee_id: req.body.employee_id,
-          sector_id: req.body.sector_id,
           position_id: req.body.position_id,
           from: req.body.from,
           to: req.body.to,
