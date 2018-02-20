@@ -39,7 +39,7 @@ module.exports = {
         req.body.to
       } between schedule.from+1 and schedule.to)) AND budget_id = ${
         req.body.budget_id
-      } AND employee_id = ${req.body.employee_id} AND ${req.body.employee_id !==
+      } AND employee_id = ${req.body.employee_id} AND ${req.body.employee_id ===
         0} LIMIT 1;`;
       con.query(query, (err, schedule) => {
         if (schedule.length) {
