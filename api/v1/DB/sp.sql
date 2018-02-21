@@ -27,7 +27,7 @@ BEGIN
     WHERE ((_from between s.from and s.to-1) OR (_to between s.from+1 and s.to)) 
     AND s.budget_id=_budget_id
     AND s.employee_id=_employee_id
-    AND (_employee_id = 0 OR s.id<>_id) 
+    AND (_employee_id = 0) 
     LIMIT 1;
 
 END$$
