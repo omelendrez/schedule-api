@@ -33,28 +33,19 @@ module.exports = {
       database: config.database
     });
     con.connect(() => {
-      let query = `SELECT id FROM schedule WHERE ((${
-        req.body.from
-      } between schedule.from and schedule.to) or (${
-        req.body.to
-      } between schedule.from+1 and schedule.to)) AND budget_id = ${
-        req.body.budget_id
-      } AND employee_id = ${req.body.employee_id} AND ${req.body.employee_id !==
-        0} LIMIT 1;`;
+      let query = `call check_overwrite(${req.body.id},${req.body.from},${req.body.to},${req.body.budget_id}, ${req.body.employee_id})`
       con.query(query, (err, schedule) => {
-        if (schedule.length) {
+        if (schedule[0][0]) {
           res.json({
             error: {
               type: ERROR,
               schedule: schedule,
-              message: schedule ? "El empleado está ocupado en ese horario" : ""
+              message: schedule ? `${schedule[0][0].first_name} ya está asignado para este día de ${schedule[0][0].from}hs. a ${schedule[0][0].to}hs.` : ""
             }
           });
         } else {
           let hours = 0;
-          let query = `SELECT coalesce(sum(schedule.to-schedule.from),0) as hours FROM schedule WHERE id = ${
-            req.body.id
-          } LIMIT 1;`;
+          let query = `SELECT coalesce(sum(schedule.to-schedule.from),0) as hours FROM schedule WHERE id = ${req.body.id} LIMIT 1;`;
           con.query(query, (err, schedule) => {
             if (schedule) {
               hours = schedule[0].hours;
@@ -65,7 +56,7 @@ module.exports = {
               parseInt(req.body.from) -
               hours} as hours FROM schedule WHERE budget_id = ${
               req.body.budget_id
-            } AND employee_id = ${req.body.employee_id} LIMIT 1;`;
+              } AND employee_id = ${req.body.employee_id} LIMIT 1;`;
             con.query(query, (err, schedule) => {
               const hours = schedule[0].hours;
               if (parseInt(hours) < 4) {
@@ -85,18 +76,47 @@ module.exports = {
                       type: WARNING,
                       schedule: schedule,
                       message: schedule
-                        ? `El empleado tiene más de 8 horas trabajadas (${hours} horas)`
+                        ? `El empleado tiene más de 8 horas trabajadas en el día (${hours} horas)`
                         : ""
                     }
                   });
                 } else {
-                  res.json({
-                    error: {
-                      type: OK,
-                      schedule: schedule,
-                      message: ""
+                  let query = `call check_blocked(${req.body.from},${req.body.to},${req.body.budget_id}, ${req.body.employee_id})`
+                  con.query(query, (err, schedule) => {
+                    if (schedule[0][0]) {
+                      res.json({
+                        error: {
+                          type: WARNING,
+                          schedule: schedule,
+                          message: schedule ? `${schedule[0][0].first_name} tiene bloqueado de ${schedule[0][0].from}hs. a ${schedule[0][0].to}hs. para este día de la semana` : ""
+                        }
+                      });
+                    } else {
+
+                      let query = `call get_presence(${req.body.budget_id}, ${req.body.employee_id})`
+                      con.query(query, (err, schedule) => {
+                        if (schedule[0][0].presence > 5) {
+                          res.json({
+                            error: {
+                              type: WARNING,
+                              schedule: schedule,
+                              message: schedule ? `El empleado ha completado los últimos 6 días de trabajo consecutivos y tiene derecho a un día de franco` : ""
+                            }
+                          });
+                        } else {
+
+                          res.json({
+                            error: {
+                              type: OK,
+                              schedule: schedule,
+                              message: ""
+                            }
+                          });
+                        }
+                      })
+
                     }
-                  });
+                  })
                 }
               }
             });
@@ -210,13 +230,13 @@ module.exports = {
               schedule =>
                 schedule
                   ? res.json({
-                      schedule: schedule,
-                      budget: { rows: budget, count: 1 }
-                    })
+                    schedule: schedule,
+                    budget: { rows: budget, count: 1 }
+                  })
                   : res.json({
-                      budget: { rows: budget, count: 1 },
-                      schedule: { count: 0, rows: [] }
-                    })
+                    budget: { rows: budget, count: 1 },
+                    schedule: { count: 0, rows: [] }
+                  })
             )
             .catch(error => res.status(400).send(error));
         } else {
