@@ -17,6 +17,7 @@ BEGIN
         );
 END$$
 DELIMITER ;
+
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `check_overwrite`(_id int, _from int, _to int, _budget_id int, _employee_id int)
 BEGIN
@@ -32,14 +33,34 @@ BEGIN
 
 END$$
 DELIMITER ;
+
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `get_presence`(_budget_id INT, _employee_id INT)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_presence`(_budget_id INT)
 BEGIN
 
-	SET @report_date = (SELECT date FROM budget WHERE id=`_budget_id`);
-	SELECT SUM(COALESCE((SELECT DISTINCT 1 FROM schedule AS s WHERE s.budget_id = b.id AND s.employee_id = `_employee_id` ), 0)) AS presence 
-    FROM budget AS b 
-    WHERE b.date BETWEEN DATE_ADD(@report_date, INTERVAL -6 DAY) AND DATE_ADD(@report_date, INTERVAL -1 DAY);
+	SET @report_date = (SELECT date FROM budget WHERE id =  `_budget_id`);
+    SET @from_date = DATE_ADD(@report_date, INTERVAL -6 DAY);
+    SET @to_date = DATE_ADD(@report_date, INTERVAL -1 DAY);
+	SELECT 
+    e.id,
+    e.badge,
+    e.last_name,
+    e.first_name,
+    (SELECT 
+            COUNT(*)
+        FROM
+            budget AS b
+        WHERE
+            b.date BETWEEN @from_date AND @to_date
+                AND b.id IN (SELECT 
+                    s.budget_id
+                FROM
+                    schedule AS s
+                WHERE
+                    s.employee_id = e.id)) AS presence
+FROM
+    employee AS e
+GROUP BY e.id , e.badge , e.last_name , e.first_name;
 
 END$$
 DELIMITER ;
