@@ -194,8 +194,8 @@ module.exports = {
           employee
             ? res.json(employee)
             : res.status(404).json({
-                error: "Not found"
-              })
+              error: "Not found"
+            })
       )
       .catch(error => res.status(400).send(error));
   },
@@ -214,8 +214,8 @@ module.exports = {
           employee
             ? res.json(employee)
             : res.status(404).json({
-                error: "Not found"
-              })
+              error: "Not found"
+            })
       )
       .catch(error => res.status(400).send(error));
   },

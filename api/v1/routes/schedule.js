@@ -10,6 +10,7 @@ router.use(function(req, res, next) {
 router.post("/verify", schedule.verifyInput);
 router.post("/", schedule.create);
 router.get("/:date/budget/:branch_id", schedule.findByBudget);
+router.get("/:budget_id/timeoff", schedule.findTimeoff);
 router.put("/:id", schedule.update);
 router.delete("/:id", schedule.delete);
 
