@@ -92,29 +92,13 @@ module.exports = {
                         }
                       });
                     } else {
-
-                      let query = `call get_presence(${req.body.budget_id}, ${req.body.employee_id})`
-                      con.query(query, (err, schedule) => {
-                        if (schedule[0][0].presence > 5) {
-                          res.json({
-                            error: {
-                              type: WARNING,
-                              schedule: schedule,
-                              message: schedule ? `El empleado ha completado los últimos 6 días de trabajo consecutivos y tiene derecho a un día de franco` : ""
-                            }
-                          });
-                        } else {
-
-                          res.json({
-                            error: {
-                              type: OK,
-                              schedule: schedule,
-                              message: ""
-                            }
-                          });
+                      res.json({
+                        error: {
+                          type: OK,
+                          schedule: schedule,
+                          message: ""
                         }
-                      })
-
+                      });
                     }
                   })
                 }
@@ -281,5 +265,30 @@ module.exports = {
         })
       )
       .catch(error => res.status(400).send(error));
+  },
+  findTimeoff(req, res) {
+    const mysql = require("mysql2");
+    const path = require("path");
+    const env = process.env.NODE_ENV || "development";
+    const config = require(path.join(__dirname, "..", "config", "config.json"))[
+      env
+    ];
+
+    const con = mysql.createConnection({
+      host: config.host,
+      user: config.username,
+      password: config.password,
+      database: config.database
+    });
+    con.connect(() => {
+      const query = `call get_presence(${req.params.budget_id})`
+      con.query(query, (err, timeoff) => {
+        if (timeoff) {
+          res.json(timeoff[0]);
+        } else {
+          res.json([]);
+        }
+      })
+    })
   }
 };
