@@ -8,12 +8,15 @@ const OK = 0;
 
 module.exports = {
   create(req, res) {
+    const from = parseInt(req.body.from)
+    let to = parseInt(req.body.to)
+    to = to < from ? to + 24 : to
     Schedule.create({
       budget_id: req.body.budget_id,
       employee_id: req.body.employee_id,
       position_id: req.body.position_id,
-      from: req.body.from,
-      to: req.body.to
+      from: from,
+      to: to
     })
       .then(schedule => res.status(201).json(schedule))
       .catch(error => res.status(400).send(error));
@@ -26,6 +29,10 @@ module.exports = {
       env
     ];
 
+    const from = parseInt(req.body.from)
+    let to = parseInt(req.body.to)
+    to = to < from ? to + 24 : to
+
     const con = mysql.createConnection({
       host: config.host,
       user: config.username,
@@ -33,7 +40,7 @@ module.exports = {
       database: config.database
     });
     con.connect(() => {
-      let query = `call check_overwrite(${req.body.id},${req.body.from},${req.body.to},${req.body.budget_id}, ${req.body.employee_id})`
+      let query = `call check_overwrite(${req.body.id},${from},${to},${req.body.budget_id}, ${req.body.employee_id})`
       con.query(query, (err, schedule) => {
         if (schedule[0][0]) {
           res.json({
@@ -50,13 +57,7 @@ module.exports = {
             if (schedule) {
               hours = schedule[0].hours;
             }
-            let query = `SELECT coalesce(sum(schedule.to-schedule.from),0)+${parseInt(
-              req.body.to
-            ) -
-              parseInt(req.body.from) -
-              hours} as hours FROM schedule WHERE budget_id = ${
-              req.body.budget_id
-              } AND employee_id = ${req.body.employee_id} LIMIT 1;`;
+            let query = `SELECT coalesce(sum(schedule.to-schedule.from),0)+${(to - from) - hours} as hours FROM schedule WHERE budget_id = ${req.body.budget_id} AND employee_id = ${req.body.employee_id} LIMIT 1;`;
             con.query(query, (err, schedule) => {
               const hours = schedule[0].hours;
               if (parseInt(hours) < 4) {
@@ -81,7 +82,7 @@ module.exports = {
                     }
                   });
                 } else {
-                  let query = `call check_blocked(${req.body.from},${req.body.to},${req.body.budget_id}, ${req.body.employee_id})`
+                  let query = `call check_blocked(${from},${to},${req.body.budget_id}, ${req.body.employee_id})`
                   con.query(query, (err, schedule) => {
                     if (schedule[0][0]) {
                       res.json({
@@ -233,6 +234,9 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
   update(req, res) {
+    const from = parseInt(req.body.from)
+    let to = parseInt(req.body.to)
+    to = to < from ? to + 24 : to
     return Schedule.findOne({
       where: {
         id: req.params.id
@@ -244,8 +248,8 @@ module.exports = {
             budget_id: req.body.budget_id,
             employee_id: req.body.employee_id,
             position_id: req.body.position_id,
-            from: req.body.from,
-            to: req.body.to
+            from: from,
+            to: to
           })
           .then(result => {
             res.json(result);
