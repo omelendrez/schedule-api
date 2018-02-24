@@ -31,66 +31,66 @@ VALUES
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, `name`, '#000000', NOW(), NOW() 
+SELECT id, `name`, '#001f3f', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Entrenamiento';
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, 'Elaboración', '#000000', NOW(), NOW() 
+SELECT id, 'Elaboración', '#0074D9', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Cocina';
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, 'Cocción', '#000000', NOW(), NOW() 
+SELECT id, 'Cocción', '#7FDBFF', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Cocina';
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, 'Runner', '#000000', NOW(), NOW() 
+SELECT id, 'Runner', '#39CCCC', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Cajas';
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, 'Cajero', '#000000', NOW(), NOW() 
+SELECT id, 'Cajero', '#3D9970', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Cajas';
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, 'Barra', '#000000', NOW(), NOW() 
+SELECT id, 'Barra', '#2ECC40', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Cafetería';
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, 'Mozo', '#000000', NOW(), NOW() 
+SELECT id, 'Mozo', '#01FF70', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Cafetería';
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, 'Servicio', '#000000', NOW(), NOW() 
+SELECT id, 'Servicio', '#FFDC00', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Salón';
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, 'Valle', '#000000', NOW(), NOW() 
+SELECT id, 'Valle', '#FF851B', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Salón';
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, `name`, '#000000', NOW(), NOW() 
+SELECT id, `name`, '#FF4136', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Depósitos';
 
 INSERT INTO `escng_schedule`.`position`
 (`sector_id`, `name`, `color`, `created_at`, `updated_at`)
-SELECT id, `name`, '#000000', NOW(), NOW() 
+SELECT id, `name`, '#85144b', NOW(), NOW() 
 FROM `escng_schedule`.`sector`
 WHERE `name` = 'Eventos';
