@@ -1,6 +1,5 @@
 "use strict";
 const Timeoff = require("../models").timeoff;
-const sequelize = require("sequelize");
 
 module.exports = {
   create(req, res) {
@@ -18,7 +17,6 @@ module.exports = {
     const size = parseInt(req.query.size ? req.query.size : 1000);
     const sort = req.query.sort ? req.query.sort : 'date';
     const type = req.query.type ? req.query.type : 'asc';
-    const filter = req.query.filter ? req.query.filter : '';
 
     return Timeoff
       .findAndCountAll({
@@ -78,9 +76,9 @@ module.exports = {
         }
       })
       .then(timeoff => timeoff.update({
-          name: req.body.name,
-          status_id: req.body.status_id
-        })
+        name: req.body.name,
+        status_id: req.body.status_id
+      })
         .then(result => {
           res.json(result);
         }))
