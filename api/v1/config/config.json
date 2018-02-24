@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "ba356101a85269",
-    "password": "cf61e602",
+    "username": "escng_schedule",
+    "password": "M1a4$1t4E8r0",
     "database": "escng_schedule",
-    "host": "br-cdbr-azure-south-b.cloudapp.net",
+    "host": "127.0.0.1",
     "dialect": "mysql",
     "define": {
       "charset": "utf8",
@@ -14,10 +14,10 @@
     "timezone": "-03:00"
   },
   "test": {
-    "username": "ba356101a85269",
-    "password": "cf61e602",
+    "username": "escng_schedule",
+    "password": "M1a4$1t4E8r0",
     "database": "escng_schedule",
-    "host": "br-cdbr-azure-south-b.cloudapp.net",
+    "host": "127.0.0.1",
     "dialect": "mysql",
     "define": {
       "charset": "utf8",
@@ -28,10 +28,10 @@
     "timezone": "-03:00"
   },
   "production": {
-    "username": "ba356101a85269",
-    "password": "cf61e602",
+    "username": "escng_schedule",
+    "password": "M1a4$1t4E8r0",
     "database": "escng_schedule",
-    "host": "br-cdbr-azure-south-b.cloudapp.net",
+    "host": "127.0.0.1",
     "dialect": "mysql",
     "define": {
       "charset": "utf8",
