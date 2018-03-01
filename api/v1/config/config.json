@@ -28,10 +28,10 @@
     "timezone": "-03:00"
   },
   "production": {
-    "username": "escng_schedule",
-    "password": "M1a4$1t4E8r0",
-    "database": "escng_schedule",
-    "host": "127.0.0.1",
+    "username": "bd83a92a47dd0f",
+    "password": "2ea13061",
+    "database": "heroku_43e6ebe3dd474ec",
+    "host": "mysql://us-cdbr-iron-east-05.cleardb.net",
     "dialect": "mysql",
     "define": {
       "charset": "utf8",
