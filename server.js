@@ -16,7 +16,7 @@ app.use(
 app.use(logger("combined"));
 
 models.sequelize.sync({
-  force: false
+  force: true
 });
 /*
 models.availability.sequelize.sync({
