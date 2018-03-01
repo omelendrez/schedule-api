@@ -8,9 +8,11 @@ const models = require(apiPath + "/models");
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+);
 app.use(logger("combined"));
 
 models.sequelize.sync({
@@ -22,11 +24,17 @@ models.availability.sequelize.sync({
 });
 */
 
-app.use(function (req, res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-  res.setHeader('Access-Control-Allow-Credentials', true);
+app.use(function(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With,content-type"
+  );
+  res.setHeader("Access-Control-Allow-Credentials", true);
   next();
 });
 
@@ -44,9 +52,10 @@ app.use("/user", require(apiPath + "/routes/user"));
 
 app.use("/login", require(apiPath + "/routes/login"));
 
-const port = 3010;
+const port = process.env.PORT || 3010;
 
-app.listen(process.env.PORT || port);
+app.set("port", port);
 
-console.log(Date());
-console.log("Listening on port " + port);
+app.listen(app.get("port"), function() {
+  console.log("Node app is running on port", app.get("port"));
+});

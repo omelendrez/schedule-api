@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Schedule backend",
   "main": "server.js",
+  "engines": {
+    "node": "8.9.4"
+  },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.2",
