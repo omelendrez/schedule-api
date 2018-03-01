@@ -46,7 +46,7 @@ app.use("/login", require(apiPath + "/routes/login"));
 
 const port = 3010;
 
-app.listen(port);
+app.listen(process.env.PORT || port);
 
 console.log(Date());
 console.log("Listening on port " + port);
