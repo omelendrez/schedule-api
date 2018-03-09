@@ -1,6 +1,18 @@
 "use strict";
 const Timeoff = require("../models").timeoff;
 const sequelize = require("sequelize");
+const errorMessage = [
+  {
+    key: "inUse",
+    value: "Esa día de franco para ese empleado ya fue cargado"
+  }
+];
+const findMessage = key => {
+  const result = errorMessage.find(item => {
+    return item.key === key;
+  });
+  return result.value;
+};
 
 module.exports = {
   create(req, res) {
@@ -9,7 +21,13 @@ module.exports = {
       date: req.body.date
     })
       .then(timeoff => res.status(201).json(timeoff))
-      .catch(error => res.status(400).send(error));
+      .catch(error => {
+        if (error.name === "SequelizeUniqueConstraintError") {
+          res.json({ error: true, message: findMessage("inUse") });
+        } else {
+          res.status(400).send(error);
+        }
+      });
   },
 
   findAll(req, res) {
