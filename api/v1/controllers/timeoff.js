@@ -88,18 +88,58 @@ module.exports = {
   },
 
   findByEmployeeId(req, res) {
+    const Employee = require("../models").employee;
+    Timeoff.belongsTo(Employee);
+
     return Timeoff.findAndCountAll({
       where: {
         employee_id: req.params.id
-      }
+      },
+      include: [
+        {
+          model: Employee,
+          where: {
+            id: sequelize.col("timeoff.employee_id")
+          },
+          attributes: ["badge", "first_name", "last_name"]
+        }
+      ]
     })
       .then(
         timeoff =>
           timeoff
             ? res.json(timeoff)
             : res.status(404).json({
-                error: "Not found"
-              })
+              error: "Not found"
+            })
+      )
+      .catch(error => res.status(400).send(error));
+  },
+  findByDate(req, res) {
+    const Employee = require("../models").employee;
+    Timeoff.belongsTo(Employee);
+    return Timeoff.findAndCountAll({
+      where: {
+        date: req.params.id
+      },
+      include: [
+        {
+          model: Employee,
+          where: {
+            id: sequelize.col("timeoff.employee_id")
+          },
+          attributes: ["badge", "first_name", "last_name"]
+        }
+      ]
+
+    })
+      .then(
+        timeoff =>
+          timeoff
+            ? res.json(timeoff)
+            : res.status(404).json({
+              error: "Not found"
+            })
       )
       .catch(error => res.status(400).send(error));
   },
