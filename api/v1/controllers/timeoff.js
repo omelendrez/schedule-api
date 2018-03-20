@@ -42,7 +42,7 @@ module.exports = {
           where: {
             id: sequelize.col("timeoff.employee_id")
           },
-          attributes: ["first_name", "last_name"]
+          attributes: ["badge", "first_name", "last_name"]
         }
       ],
       sort: ["date", "DESC"],
