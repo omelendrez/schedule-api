@@ -93,13 +93,27 @@ module.exports = {
                         }
                       });
                     } else {
-                      res.json({
-                        error: {
-                          type: OK,
-                          schedule: schedule,
-                          message: ""
+                      let query = `select 1 from timeoff where employee_id = ${req.body.employee_id} and date = '${req.body.date}'`
+                      con.query(query, (err, schedule) => {
+                        console.log('-------------------------', schedule)
+                        if (schedule[0]) {
+                          res.json({
+                            error: {
+                              type: WARNING,
+                              schedule: schedule,
+                              message: schedule ? `El empleado está de FRANCO en este día` : ""
+                            }
+                          });
+                        } else {
+                          res.json({
+                            error: {
+                              type: OK,
+                              schedule: schedule,
+                              message: ""
+                            }
+                          });
                         }
-                      });
+                      })
                     }
                   })
                 }
