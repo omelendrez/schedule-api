@@ -57,6 +57,37 @@ module.exports = {
       .then(budget => res.json(budget))
       .catch(error => res.status(400).send(error));
   },
+
+  findByPositionId(req, res) {
+    const Employee = require("../models").employee;
+    EmployeePosition.belongsTo(Employee)
+
+    return EmployeePosition
+      .findAndCountAll({
+        raw: true,
+        where: {
+          position_id: req.params.id
+        },
+        attributes: [],
+        include: {
+          model: Employee,
+          where: {
+            id: sequelize.col('employee_position.employee_id'),
+            status_id: 1
+          },
+          attributes: [
+            'id',
+            'badge',
+            'last_name',
+            'first_name'
+          ]
+
+        }
+      })
+      .then(employeePosition => res.json(employeePosition))
+      .catch(error => res.status(400).send(error));
+  },
+
   delete(req, res) {
     EmployeePosition
       .findOne({

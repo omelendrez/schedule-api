@@ -43,6 +43,7 @@ app.use("/branch", require(apiPath + "/routes/branch"));
 app.use("/budget", require(apiPath + "/routes/budget"));
 app.use("/employee", require(apiPath + "/routes/employee"));
 app.use("/position", require(apiPath + "/routes/position"));
+app.use("/employee_position", require(apiPath + "/routes/employee_position"));
 app.use("/profile", require(apiPath + "/routes/profile"));
 app.use("/schedule", require(apiPath + "/routes/schedule"));
 app.use("/sector", require(apiPath + "/routes/sector"));
