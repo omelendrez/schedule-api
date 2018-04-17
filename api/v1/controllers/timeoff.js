@@ -42,45 +42,17 @@ module.exports = {
           where: {
             id: sequelize.col("timeoff.employee_id")
           },
-          attributes: ["badge", "first_name", "last_name"]
+          attributes: ["badge", "first_name", "last_name", "branch_id"]
         }
       ],
       sort: ["date", "DESC"],
       attributes: [
         "id",
         "employee_id",
-        [
-          sequelize.fn(
-            "date_format",
-            sequelize.col("timeoff.date"),
-            "%d-%b-%y"
-          ),
-          "date"
-        ],
-        [
-          sequelize.fn(
-            "date_format",
-            sequelize.col("timeoff.date"),
-            "%Y-%m-%d"
-          ),
-          "_date"
-        ],
-        [
-          sequelize.fn(
-            "date_format",
-            sequelize.col("timeoff.created_at"),
-            "%d-%b-%y"
-          ),
-          "created_at"
-        ],
-        [
-          sequelize.fn(
-            "date_format",
-            sequelize.col("timeoff.updated_at"),
-            "%d-%b-%y"
-          ),
-          "updated_at"
-        ]
+        [sequelize.fn("date_format",sequelize.col("timeoff.date"),"%d-%b-%y"),"date"],
+        [sequelize.fn("date_format",sequelize.col("timeoff.date"),"%Y-%m-%d"),"_date"],
+        [sequelize.fn("date_format",sequelize.col("timeoff.created_at"),"%d-%b-%y"),"created_at"],
+        [sequelize.fn("date_format",sequelize.col("timeoff.updated_at"),"%d-%b-%y"),"updated_at"]
       ]
     })
       .then(timeoff => res.json(timeoff))

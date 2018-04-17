@@ -34,7 +34,8 @@ module.exports = {
             .create({
               user_name: req.body.user_name,
               full_name: fullName.join(" "),
-              profile_id: req.body.profile_id
+              profile_id: req.body.profile_id,
+              branch_id: req.body.branch_id
             })
             .then(user => res.status(201).json(user))
             .catch(error => res.status(400).send(error));
@@ -45,8 +46,10 @@ module.exports = {
   findAll(req, res) {
     const Status = require("../models").status;
     const Profile = require("../models").profile;
+    const Branch = require("../models").branch;
     User.belongsTo(Status);
     User.belongsTo(Profile);
+    User.belongsTo(Branch);
 
     const page = parseInt(req.query.page ? req.query.page : 0);
     const size = parseInt(req.query.size ? req.query.size : 1000);
@@ -83,6 +86,14 @@ module.exports = {
           attributes: [
             'name'
           ]
+        }, {
+          model: Branch,
+          where: {
+            id: sequelize.col('user.branch_id')
+          },
+          attributes: [
+            'name'
+          ]
         }],
         attributes: [
           'id',
@@ -90,6 +101,7 @@ module.exports = {
           'full_name',
           'status_id',
           'profile_id',
+          'branch_id',
           [sequelize.fn('date_format', sequelize.col('user.created_at'), '%d-%b-%y'), 'created_at'],
           [sequelize.fn('date_format', sequelize.col('user.updated_at'), '%d-%b-%y'), 'updated_at']
         ]
@@ -103,6 +115,8 @@ module.exports = {
     User.belongsTo(Status);
     const Profile = require("../models").profile;
     User.belongsTo(Profile);
+    const Branch = require("../models").branch;
+    User.belongsTo(Branch);
 
     return User
       .findOne({
@@ -118,6 +132,11 @@ module.exports = {
           model: Profile,
           where: {
             id: sequelize.col('user.profile_id')
+          }
+        }, {
+          model: Branch,
+          where: {
+            id: sequelize.col('user.branch_id')
           }
         }]
       })
@@ -186,7 +205,8 @@ module.exports = {
               {
                 user_name: req.body.user_name,
                 full_name: fullName.join(" "),
-                profile_id: req.body.profile_id
+                profile_id: req.body.profile_id,
+                branch_id: req.body.branch_id
               })
               .then(result => {
                 res.json(result);
