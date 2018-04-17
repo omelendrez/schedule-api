@@ -79,7 +79,8 @@ module.exports = {
             'id',
             'badge',
             'last_name',
-            'first_name'
+            'first_name',
+            'branch_id'
           ]
 
         }
