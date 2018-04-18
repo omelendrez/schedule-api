@@ -5,7 +5,7 @@ const Availability = require("../models").availability;
 const sequelize = require("sequelize");
 
 module.exports = {
-  create(req, res) {
+  create (req, res) {
     const badge = req.body.badge.toUpperCase();
     const last_name =
       req.body.last_name.charAt(0).toUpperCase() + req.body.last_name.slice(1);
@@ -53,7 +53,7 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  findAll(req, res) {
+  findAll (req, res) {
     const Status = require("../models").status;
     const Branch = require("../models").branch;
 
@@ -141,7 +141,7 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  findById(req, res) {
+  findById (req, res) {
     const Status = require("../models").status;
     const Branch = require("../models").branch;
     const Availability = require("../models").availability;
@@ -199,7 +199,7 @@ module.exports = {
       )
       .catch(error => res.status(400).send(error));
   },
-  findByBranchId(req, res) {
+  findByBranchId (req, res) {
     return Employee.findAndCountAll({
       raw: true,
       where: {
@@ -220,24 +220,40 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  delete(req, res) {
-    return Employee.findOne({
-      where: {
-        id: req.params.id
-      }
-    })
-      .then(employee =>
-        employee
-          .update({
-            status_id: employee.status_id === 1 ? 2 : 1
+  delete (req, res) {
+    const Schedules = require('../models').schedule
+    Schedules
+      .findOne({
+        where: {
+          employee_id: req.params.id
+        }
+      })
+      .then(schedules => {
+        if (schedules) {
+          Employee.findOne({
+            where: {
+              id: req.params.id
+            }
           })
-          .then(result => {
-            res.json(result);
+            .then(employee => {
+              employee.update({ status_id: employee.status_id === 1 ? 2 : 1 }).then(() => res.json({ error: true, message: 'El empleado no puede ser eliminado de la base de datos porque tiene horas programadas, por lo tanto ha sido puesto inactivo.', data: schedules }))
+            })
+            .catch(error => res.status(400).send(error))
+        } else {
+          Employee.findOne({
+            where: {
+              id: req.params.id
+            }
           })
-      )
-      .catch(error => res.status(400).send(error));
+            .then(employee => {
+              employee.destroy().then(() => res.json({ success: true }))
+            })
+            .catch(error => res.status(400).send(error))
+        }
+      })
+      .catch(error => res.status(400).send(error))
   },
-  update(req, res) {
+  update (req, res) {
     const badge = req.body.badge.toUpperCase();
     const last_name =
       req.body.last_name.charAt(0).toUpperCase() + req.body.last_name.slice(1);
