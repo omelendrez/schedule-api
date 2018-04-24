@@ -20,6 +20,10 @@ module.exports = function(sequelize, DataTypes) {
     to: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    total: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     }
   }, {
     indexes: [{

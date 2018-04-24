@@ -56,6 +56,7 @@ module.exports = {
           [sequelize.fn('date_format', sequelize.col('date'), '%d-%m-%y'), 'date'],
           [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), '_date'],
           'hours',
+          "program",
           'footer',
           [sequelize.fn('weekday', sequelize.col('date')), 'weekday'],
           [sequelize.fn('date_format', sequelize.col('budget.created_at'), '%d-%b-%y'), 'created_at'],
@@ -116,7 +117,8 @@ module.exports = {
     return Budget
       .findOne({
         where: {
-          id: req.params.id
+          id: req.params.id,
+          program: 0
         }
       })
       .then(budget => budget.destroy()
