@@ -6,8 +6,27 @@ const ERROR = 1;
 const WARNING = 2;
 const OK = 0;
 
+const updateTotals = (budget_id) => {
+  const mysql = require("mysql2");
+  const path = require("path");
+  const env = process.env.NODE_ENV || "development";
+  const config = require(path.join(__dirname, "..", "config", "config.json"))[
+    env
+  ];
+  const con = mysql.createConnection({
+    host: config.host,
+    user: config.username,
+    password: config.password,
+    database: config.database
+  });
+  con.connect(() => {
+    let query = `call update_total_hours(${budget_id})`
+    con.query(query)
+  })
+}
+
 module.exports = {
-  create(req, res) {
+  create (req, res) {
     const from = parseInt(req.body.from)
     let to = parseInt(req.body.to)
     to = to < from ? to + 24 : to
@@ -18,10 +37,13 @@ module.exports = {
       from: from,
       to: to
     })
-      .then(schedule => res.status(201).json(schedule))
+      .then(schedule => {
+        updateTotals(req.body.budget_id)
+        res.status(201).json(schedule)
+      })
       .catch(error => res.status(400).send(error));
   },
-  verifyInput(req, res) {
+  verifyInput (req, res) {
     const mysql = require("mysql2");
     const path = require("path");
     const env = process.env.NODE_ENV || "development";
@@ -124,7 +146,7 @@ module.exports = {
       });
     });
   },
-  findByBudget(req, res) {
+  findByBudget (req, res) {
     const Budget = require("../models").budget;
     const Employee = require("../models").employee;
     const Position = require("../models").position;
@@ -247,7 +269,7 @@ module.exports = {
       })
       .catch(error => res.status(400).send(error));
   },
-  update(req, res) {
+  update (req, res) {
     const from = parseInt(req.body.from)
     let to = parseInt(req.body.to)
     to = to < from ? to + 24 : to
@@ -266,12 +288,13 @@ module.exports = {
             to: to
           })
           .then(result => {
+            updateTotals(req.body.budget_id)
             res.json(result);
           })
       )
       .catch(error => res.status(400).send(error));
   },
-  delete(req, res) {
+  delete (req, res) {
     return Schedule.findOne({
       where: {
         id: req.params.id
@@ -284,7 +307,7 @@ module.exports = {
       )
       .catch(error => res.status(400).send(error));
   },
-  findTimeoff(req, res) {
+  findTimeoff (req, res) {
     const mysql = require("mysql2");
     const path = require("path");
     const env = process.env.NODE_ENV || "development";

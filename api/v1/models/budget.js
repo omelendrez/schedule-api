@@ -13,11 +13,15 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    program: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
     footer: {
       type: DataTypes.STRING,
       allowNull: false
     }
-  }, 
+  },
     {
       indexes: [{
         unique: true,
