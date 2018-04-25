@@ -300,10 +300,13 @@ module.exports = {
         id: req.params.id
       }
     })
-      .then(schedule =>
+      .then(schedule => {
+        const budget_id = schedule.budget_id
         schedule.destroy().then(() => {
+          updateTotals(budget_id)
           res.json({ status: true });
         })
+      }
       )
       .catch(error => res.status(400).send(error));
   },
