@@ -62,8 +62,6 @@ module.exports = {
 
     const page = parseInt(req.query.page ? req.query.page : 0);
     const size = parseInt(req.query.size ? req.query.size : 1000);
-    const sort = req.query.sort ? req.query.sort : "badge";
-    const type = req.query.type ? req.query.type : "asc";
     const filter = req.query.filter ? req.query.filter : "";
 
     return Employee.findAndCountAll({
@@ -76,7 +74,7 @@ module.exports = {
           $like: "%" + filter + "%"
         }
       },
-      order: [[sort, type]],
+      order: ["badge"],
       offset: size !== 1000 ? (page - 1) * size : 0,
       limit: size,
       include: [
@@ -206,7 +204,7 @@ module.exports = {
         branch_id: req.params.id,
         status_id: 1
       },
-      attributes: ["id", "badge", "first_name", "last_name"],
+      attributes: ["id", "badge", "first_name", "last_name", "branch_id"],
       order: ["badge"]
     })
       .then(
