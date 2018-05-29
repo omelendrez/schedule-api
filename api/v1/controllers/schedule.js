@@ -197,7 +197,7 @@ module.exports = {
             where: {
               budget_id: budget.id
             },
-            order: [["position_id", "ASC"], ["from", "ASC"], ["to", "ASC"]],
+            order: [["position_id", "ASC"], ["employee_id", "ASC"], ["from", "ASC"], ["to", "ASC"]],
             attributes: [
               "id",
               "from",
