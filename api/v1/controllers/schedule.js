@@ -193,11 +193,14 @@ module.exports = {
       .then(budget => {
         if (budget) {
           Schedule.findAndCountAll({
-            raw: true,
             where: {
               budget_id: budget.id
             },
-            order: [["position_id", "ASC"], ["employee_id", "ASC"], ["from", "ASC"], ["to", "ASC"]],
+            order: [
+              [Employee, 'last_name', 'ASC'],
+              [Employee, 'first_name', 'ASC'],
+              ['from', 'ASC']
+            ],
             attributes: [
               "id",
               "from",
@@ -225,7 +228,8 @@ module.exports = {
               {
                 model: Employee,
                 where: {
-                  id: sequelize.col("schedule.employee_id")
+                  id: sequelize.col("schedule.employee_id"),
+                  status_id: 1
                 },
                 attributes: ["badge", "first_name", "last_name"]
               },
@@ -242,6 +246,111 @@ module.exports = {
                       id: sequelize.col("position.sector_id")
                     },
                     attributes: ["name"]
+                  }
+                ]
+              }
+            ]
+          })
+            .then(
+              schedule =>
+                schedule
+                  ? res.json({
+                    schedule: schedule,
+                    budget: { rows: budget, count: 1 }
+                  })
+                  : res.json({
+                    budget: { rows: budget, count: 1 },
+                    schedule: { count: 0, rows: [] }
+                  })
+            )
+            .catch(error => res.status(400).send(error));
+        } else {
+          res.json({
+            budget: { count: 0, rows: [] },
+            schedule: { count: 0, rows: [] }
+          });
+        }
+      })
+      .catch(error => res.status(400).send(error));
+  },
+  findSchedule (req, res) {
+    const Budget = require("../models").budget;
+    const Employee = require("../models").employee;
+    const Position = require("../models").position;
+    const Branch = require("../models").branch;
+
+    Employee.hasMany(Schedule)
+    Schedule.belongsTo(Position);
+    Budget.belongsTo(Branch);
+
+    return Budget.findOne({
+      raw: true,
+      where: {
+        date: req.params.date,
+        branch_id: req.params.branch_id
+      },
+      attributes: [
+        "id",
+        "date",
+        [sequelize.fn("weekday", sequelize.col("date")), "weekday"],
+        [sequelize.fn("weekday", sequelize.col("date")), "_weekday"],
+        [
+          sequelize.fn("date_format", sequelize.col("date"), "%Y-%m-%d"),
+          "_date"
+        ],
+        "hours",
+        "footer",
+        "branch_id",
+        [sequelize.fn("date_format", sequelize.col("date"), "%d-%m-%Y"), "date"]
+      ],
+      include: [
+        {
+          model: Branch,
+          where: {
+            id: sequelize.col("budget.branch_id")
+          },
+          attributes: ["name"]
+        }
+      ]
+    })
+      .then(budget => {
+        if (budget) {
+          Employee.findAndCountAll({
+            where: {
+              branch_id: budget.branch_id,
+              status_id: 1
+            },
+            order: [
+              ['last_name', 'ASC'],
+              ['first_name', 'ASC']
+            ],
+            attributes: ["id", "badge", "first_name", "last_name"],
+            include: [
+              {
+                model: Schedule,
+                where: {
+                  employee_id: sequelize.col("employee.id"),
+                  budget_id: budget.id
+                },
+                attributes: [
+                  "id",
+                  "budget_id",
+                  "from",
+                  "to",
+                  "position_id"
+                ],
+                order: [
+                  "from",
+                  "to"
+                ],
+                required: false,
+                include: [
+                  {
+                    model: Position,
+                    where: {
+                      id: sequelize.col("schedules.position_id")
+                    },
+                    attributes: ["name", "color"]
                   }
                 ]
               }
