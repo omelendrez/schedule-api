@@ -197,6 +197,8 @@ module.exports = {
               budget_id: budget.id
             },
             order: [
+              [Position, 'sector_id', 'ASC'],
+              [Position, 'name', 'ASC'],
               [Employee, 'last_name', 'ASC'],
               [Employee, 'first_name', 'ASC'],
               ['from', 'ASC']
