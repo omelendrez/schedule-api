@@ -280,8 +280,10 @@ module.exports = {
     const Employee = require("../models").employee;
     const Position = require("../models").position;
     const Branch = require("../models").branch;
+    const Availability = require("../models").availability;
 
     Employee.hasMany(Schedule)
+    Employee.hasMany(Availability)
     Schedule.belongsTo(Position);
     Budget.belongsTo(Branch);
 
@@ -328,6 +330,18 @@ module.exports = {
             ],
             attributes: ["id", "badge", "first_name", "last_name"],
             include: [
+              {
+                model: Availability,
+                where: {
+                  employee_id: sequelize.col("employee.id")
+                },
+                attributes: [
+                  "week_day",
+                  "from",
+                  "to"
+                ],
+                required: false
+              },
               {
                 model: Schedule,
                 where: {
