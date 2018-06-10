@@ -15,9 +15,10 @@ const findMessage = key => {
 };
 
 module.exports = {
-  create(req, res) {
+  create (req, res) {
     return Timeoff.create({
       employee_id: req.body.employee_id,
+      absenteeism_id: req.body.absenteeism_id,
       date: req.body.date
     })
       .then(timeoff => res.status(201).json(timeoff))
@@ -30,9 +31,11 @@ module.exports = {
       });
   },
 
-  findAll(req, res) {
+  findAll (req, res) {
     const Employee = require("../models").employee;
+    const Absenteeism = require("../models").absenteeism;
     Timeoff.belongsTo(Employee);
+    Timeoff.belongsTo(Absenteeism)
 
     return Timeoff.findAndCountAll({
       raw: true,
@@ -43,23 +46,31 @@ module.exports = {
             id: sequelize.col("timeoff.employee_id")
           },
           attributes: ["badge", "first_name", "last_name", "branch_id"]
+        },
+        {
+          model: Absenteeism,
+          where: {
+            id: sequelize.col("timeoff.absenteeism_id")
+          },
+          attributes: ["name"]
         }
       ],
       sort: ["date", "DESC"],
       attributes: [
         "id",
         "employee_id",
-        [sequelize.fn("date_format",sequelize.col("timeoff.date"),"%d-%b-%y"),"date"],
-        [sequelize.fn("date_format",sequelize.col("timeoff.date"),"%Y-%m-%d"),"_date"],
-        [sequelize.fn("date_format",sequelize.col("timeoff.created_at"),"%d-%b-%y"),"created_at"],
-        [sequelize.fn("date_format",sequelize.col("timeoff.updated_at"),"%d-%b-%y"),"updated_at"]
+        "absenteeism_id",
+        [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%d-%b-%y"), "date"],
+        [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%Y-%m-%d"), "_date"],
+        [sequelize.fn("date_format", sequelize.col("timeoff.created_at"), "%d-%b-%y"), "created_at"],
+        [sequelize.fn("date_format", sequelize.col("timeoff.updated_at"), "%d-%b-%y"), "updated_at"]
       ]
     })
       .then(timeoff => res.json(timeoff))
       .catch(error => res.status(400).send(error));
   },
 
-  findByEmployeeId(req, res) {
+  findByEmployeeId (req, res) {
     const Employee = require("../models").employee;
     Timeoff.belongsTo(Employee);
 
@@ -87,7 +98,7 @@ module.exports = {
       )
       .catch(error => res.status(400).send(error));
   },
-  findByDate(req, res) {
+  findByDate (req, res) {
     const Employee = require("../models").employee;
     Timeoff.belongsTo(Employee);
     return Timeoff.findAndCountAll({
@@ -115,7 +126,7 @@ module.exports = {
       )
       .catch(error => res.status(400).send(error));
   },
-  delete(req, res) {
+  delete (req, res) {
     return Timeoff.findOne({
       where: {
         id: req.params.id
@@ -128,7 +139,7 @@ module.exports = {
       )
       .catch(error => res.status(400).send(error));
   },
-  update(req, res) {
+  update (req, res) {
     return Timeoff.findOne({
       where: {
         id: req.params.id
@@ -138,6 +149,7 @@ module.exports = {
         timeoff
           .update({
             employee_id: req.body.employee_id,
+            absenteeism_id: req.body.absenteeism_id,
             date: req.body.date
           })
           .then(result => {

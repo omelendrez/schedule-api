@@ -281,8 +281,12 @@ module.exports = {
     const Position = require("../models").position;
     const Branch = require("../models").branch;
     const Availability = require("../models").availability;
+    const Timeoff = require("../models").timeoff;
+    const Absenteeism = require("../models").absenteeism
 
     Employee.hasMany(Schedule)
+    Employee.hasMany(Timeoff)
+    Timeoff.belongsTo(Absenteeism)
     Employee.hasMany(Availability)
     Schedule.belongsTo(Position);
     Budget.belongsTo(Branch);
@@ -341,6 +345,22 @@ module.exports = {
                   "to"
                 ],
                 required: false
+              },
+              {
+                model: Timeoff,
+                where: {
+                  employee_id: sequelize.col("employee.id"),
+                  date: budget._date
+                },
+                attributes: ["absenteeism_id"],
+                required: false,
+                include: {
+                  model: Absenteeism,
+                  where: {
+                    id: sequelize.col("absenteeism_id")
+                  },
+                  attributes: ["name"]
+                }
               },
               {
                 model: Schedule,
