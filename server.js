@@ -38,6 +38,7 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.use("/absenteeism", require(apiPath + "/routes/absenteeism"));
 app.use("/availability", require(apiPath + "/routes/availability"));
 app.use("/branch", require(apiPath + "/routes/branch"));
 app.use("/budget", require(apiPath + "/routes/budget"));

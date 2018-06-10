@@ -1,9 +1,13 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Timeoff = sequelize.define(
     "timeoff",
     {
       employee_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      absenteeism_id: {
         type: DataTypes.INTEGER,
         allowNull: false
       },

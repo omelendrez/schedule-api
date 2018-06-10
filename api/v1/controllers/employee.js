@@ -74,7 +74,7 @@ module.exports = {
           $like: "%" + filter + "%"
         }
       },
-      order: ["badge"],
+      order: ["last_name", "first_name"],
       offset: size !== 1000 ? (page - 1) * size : 0,
       limit: size,
       include: [
@@ -205,7 +205,7 @@ module.exports = {
         status_id: 1
       },
       attributes: ["id", "badge", "first_name", "last_name", "branch_id"],
-      order: ["badge"]
+      order: ["last_name", "first_name"]
     })
       .then(
         employee =>
