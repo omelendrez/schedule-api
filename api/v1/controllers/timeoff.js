@@ -55,7 +55,7 @@ module.exports = {
           attributes: ["name"]
         }
       ],
-      sort: ["date", "DESC"],
+      order: [["date", "DESC"]],
       attributes: [
         "id",
         "employee_id",
