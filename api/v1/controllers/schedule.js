@@ -240,7 +240,7 @@ module.exports = {
                 where: {
                   id: sequelize.col("schedule.position_id")
                 },
-                attributes: ["name", "color"],
+                attributes: ["name", "color", "text"],
                 include: [
                   {
                     model: Sector,
@@ -386,7 +386,7 @@ module.exports = {
                     where: {
                       id: sequelize.col("schedules.position_id")
                     },
-                    attributes: ["name", "color"]
+                    attributes: ["name", "color", "text"]
                   }
                 ]
               }
