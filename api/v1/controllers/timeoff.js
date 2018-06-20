@@ -107,6 +107,10 @@ module.exports = {
       where: {
         date: req.params.date
       },
+      order: [
+        [Employee, 'last_name', 'ASC'],
+        [Employee, 'first_name', 'ASC']
+      ],
       include: [
         {
           model: Employee,
