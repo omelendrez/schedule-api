@@ -8,7 +8,7 @@ router.use(function (req, res, next) {
   next();
 });
 router.get("/:id/employee", timeoff.findByEmployeeId);
-router.get("/:id/date", timeoff.findByDate);
+router.get("/:date/date", timeoff.findByDate);
 router.get("/", timeoff.findAll);
 router.post("/", timeoff.create);
 router.put("/:id", timeoff.update);

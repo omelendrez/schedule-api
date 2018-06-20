@@ -100,10 +100,12 @@ module.exports = {
   },
   findByDate (req, res) {
     const Employee = require("../models").employee;
+    const Absenteeism = require("../models").absenteeism;
     Timeoff.belongsTo(Employee);
+    Timeoff.belongsTo(Absenteeism)
     return Timeoff.findAndCountAll({
       where: {
-        date: req.params.id
+        date: req.params.date
       },
       include: [
         {
@@ -112,6 +114,13 @@ module.exports = {
             id: sequelize.col("timeoff.employee_id")
           },
           attributes: ["badge", "first_name", "last_name"]
+        },
+        {
+          model: Absenteeism,
+          where: {
+            id: sequelize.col("timeoff.absenteeism_id")
+          },
+          attributes: ["name"]
         }
       ]
 

@@ -161,7 +161,6 @@ module.exports = {
     Budget.belongsTo(Branch);
 
     return Budget.findOne({
-      raw: true,
       where: {
         date: req.params.date,
         branch_id: req.params.branch_id
@@ -197,11 +196,11 @@ module.exports = {
               budget_id: budget.id
             },
             order: [
-              [Position, 'sector_id', 'ASC'],
-              [Position, 'name', 'ASC'],
               [Employee, 'last_name', 'ASC'],
               [Employee, 'first_name', 'ASC'],
-              ['from', 'ASC']
+              ['from', 'ASC'],
+              [Position, 'sector_id', 'ASC'],
+              [Position, 'name', 'ASC']
             ],
             attributes: [
               "id",
