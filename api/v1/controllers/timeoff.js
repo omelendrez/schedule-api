@@ -1,6 +1,7 @@
 "use strict";
 const Timeoff = require("../models").timeoff;
 const sequelize = require("sequelize");
+const Op = sequelize.Op
 const errorMessage = [
   {
     key: "inUse",
@@ -98,6 +99,7 @@ module.exports = {
       )
       .catch(error => res.status(400).send(error));
   },
+
   findByDate (req, res) {
     const Employee = require("../models").employee;
     const Absenteeism = require("../models").absenteeism;
@@ -139,6 +141,56 @@ module.exports = {
       )
       .catch(error => res.status(400).send(error));
   },
+
+  findByPeriod (req, res) {
+    const Employee = require("../models").employee;
+    const Absenteeism = require("../models").absenteeism;
+    Timeoff.belongsTo(Employee);
+    Timeoff.belongsTo(Absenteeism)
+    return Timeoff.findAndCountAll({
+      where: {
+        date: {
+          [Op.between]: [req.params.date_from, req.params.date_to]
+        }
+      },
+      attributes: [
+        [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%d-%b-%y"), "date"],
+        'absenteeism_id'
+      ],
+      order: [
+        [Employee, 'last_name', 'ASC'],
+        [Employee, 'first_name', 'ASC'],
+        ['date', 'ASC']
+      ],
+      include: [
+        {
+          model: Employee,
+          where: {
+            id: sequelize.col("timeoff.employee_id")
+          },
+          attributes: ["badge", "first_name", "last_name"]
+        },
+        {
+          model: Absenteeism,
+          where: {
+            id: sequelize.col("timeoff.absenteeism_id")
+          },
+          attributes: ["name"]
+        }
+      ]
+
+    })
+      .then(
+        timeoff =>
+          timeoff
+            ? res.json(timeoff)
+            : res.status(404).json({
+              error: "Not found"
+            })
+      )
+      .catch(error => res.status(400).send(error));
+  },
+
   delete (req, res) {
     return Timeoff.findOne({
       where: {
@@ -152,6 +204,7 @@ module.exports = {
       )
       .catch(error => res.status(400).send(error));
   },
+
   update (req, res) {
     return Timeoff.findOne({
       where: {

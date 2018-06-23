@@ -9,6 +9,7 @@ router.use(function (req, res, next) {
 });
 router.get("/:id/employee", timeoff.findByEmployeeId);
 router.get("/:date/date", timeoff.findByDate);
+router.get("/:date_from/:date_to/:absenteeism_id/period", timeoff.findByPeriod);
 router.get("/", timeoff.findAll);
 router.post("/", timeoff.create);
 router.put("/:id", timeoff.update);
