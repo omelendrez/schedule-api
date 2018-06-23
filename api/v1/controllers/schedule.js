@@ -117,7 +117,6 @@ module.exports = {
                     } else {
                       let query = `select 1 from timeoff where employee_id = ${req.body.employee_id} and date = '${req.body.date}'`
                       con.query(query, (err, schedule) => {
-                        console.log('-------------------------', schedule)
                         if (schedule[0]) {
                           res.json({
                             error: {
