@@ -162,7 +162,6 @@ module.exports = {
         ]
         break
     }
-    console.log('order', order)
     Timeoff.belongsTo(Employee);
     Timeoff.belongsTo(Absenteeism)
     return Timeoff.findAndCountAll({
@@ -173,6 +172,7 @@ module.exports = {
       },
       attributes: [
         [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%d-%b-%y"), "date"],
+        [sequelize.fn("weekday", sequelize.col("timeoff.date")), "week_day"],
         'absenteeism_id'
       ],
       order: order,
