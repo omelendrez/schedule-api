@@ -145,6 +145,23 @@ module.exports = {
   findByPeriod (req, res) {
     const Employee = require("../models").employee;
     const Absenteeism = require("../models").absenteeism;
+    let order = ''
+    switch (req.params.sort_by) {
+      case '0':
+        order = [
+          [Employee, 'last_name', 'ASC'],
+          [Employee, 'first_name', 'ASC'],
+          ['date', 'ASC']
+        ]
+        break
+      case '1':
+        order = [
+          ['date', 'ASC'],
+          [Employee, 'last_name', 'ASC'],
+          [Employee, 'first_name', 'ASC']
+        ]
+        break
+    }
     Timeoff.belongsTo(Employee);
     Timeoff.belongsTo(Absenteeism)
     return Timeoff.findAndCountAll({
@@ -155,13 +172,10 @@ module.exports = {
       },
       attributes: [
         [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%d-%b-%y"), "date"],
+        [sequelize.fn("weekday", sequelize.col("timeoff.date")), "week_day"],
         'absenteeism_id'
       ],
-      order: [
-        [Employee, 'last_name', 'ASC'],
-        [Employee, 'first_name', 'ASC'],
-        ['date', 'ASC']
-      ],
+      order: order,
       include: [
         {
           model: Employee,
