@@ -53,7 +53,7 @@ module.exports = {
         attributes: [
           'id',
           'branch_id',
-          [sequelize.fn('date_format', sequelize.col('date'), '%d-%m-%y'), 'date'],
+          [sequelize.fn('date_format', sequelize.col('date'), '%d-%b-%Y'), 'date'],
           [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), '_date'],
           'hours',
           "program",
