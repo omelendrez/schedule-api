@@ -61,7 +61,7 @@ module.exports = {
         "id",
         "employee_id",
         "absenteeism_id",
-        [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%d-%b-%y"), "date"],
+        [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%d-%b-%Y"), "date"],
         [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%Y-%m-%d"), "_date"],
         [sequelize.fn("date_format", sequelize.col("timeoff.created_at"), "%d-%b-%y"), "created_at"],
         [sequelize.fn("date_format", sequelize.col("timeoff.updated_at"), "%d-%b-%y"), "updated_at"]
@@ -88,6 +88,25 @@ module.exports = {
           attributes: ["badge", "first_name", "last_name"]
         }
       ]
+    })
+      .then(
+        timeoff =>
+          timeoff
+            ? res.json(timeoff)
+            : res.status(404).json({
+              error: "Not found"
+            })
+      )
+      .catch(error => res.status(400).send(error));
+  },
+
+  findAllTimeTimeoffs (req, res) {
+    return Timeoff.findAndCountAll({
+      where: {
+        absenteeism_id: 1
+      },
+      order: [['employee_id', 'ASC'], ["date", "DESC"]],
+      attributes: ['employee_id', [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%d-%b-%Y"), "date"]]
     })
       .then(
         timeoff =>
