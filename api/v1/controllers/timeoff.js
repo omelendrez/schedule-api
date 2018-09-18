@@ -30,12 +30,13 @@ module.exports = {
     const employee_id = req.body.employee_id
     const absenteeism_id = req.body.absenteeism_id
     const date = req.body.date
-    if (parseInt(absenteeism_id) === 1) {
+    const forced = req.body.forced
+    if (parseInt(absenteeism_id) === 1 && !forced) {
       const query = `call verify_timeoff(${employee_id},'${date}')`
       seq.query(query)
         .then(data => {
           if (data.length) {
-            res.json({ error: true, message: findMessage("duplicatedTimeoff").replace('{date}', data[0].timeoff) });
+            res.json({ warning: true, message: findMessage("duplicatedTimeoff").replace('{date}', data[0].timeoff) });
           } else {
             return Timeoff.create({
               employee_id: employee_id,
