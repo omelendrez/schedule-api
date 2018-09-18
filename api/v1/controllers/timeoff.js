@@ -2,10 +2,20 @@
 const Timeoff = require("../models").timeoff;
 const sequelize = require("sequelize");
 const Op = sequelize.Op
+const path = require("path");
+const env = process.env.NODE_ENV || "development";
+const config = require(path.join(__dirname, "..", "config", "config.json"))[
+  env
+];
+const seq = new sequelize(config.database, config.username, config.password, config);
 const errorMessage = [
   {
     key: "inUse",
-    value: "Esa día de franco para ese empleado ya fue cargado"
+    value: "Este empleado ya tiene cargado un ausentismo en esa fecha"
+  },
+  {
+    key: "duplicatedTimeoff",
+    value: "Este empleado ya tiene un franco cargado en esa semana ({date})"
   }
 ];
 const findMessage = key => {
@@ -17,19 +27,46 @@ const findMessage = key => {
 
 module.exports = {
   create (req, res) {
-    return Timeoff.create({
-      employee_id: req.body.employee_id,
-      absenteeism_id: req.body.absenteeism_id,
-      date: req.body.date
-    })
-      .then(timeoff => res.status(201).json(timeoff))
-      .catch(error => {
-        if (error.name === "SequelizeUniqueConstraintError") {
-          res.json({ error: true, message: findMessage("inUse") });
-        } else {
-          res.status(400).send(error);
-        }
-      });
+    const employee_id = req.body.employee_id
+    const absenteeism_id = req.body.absenteeism_id
+    const date = req.body.date
+    if (parseInt(absenteeism_id) === 1) {
+      const query = `call verify_timeoff(${employee_id},'${date}')`
+      seq.query(query)
+        .then(data => {
+          if (data.length) {
+            res.json({ error: true, message: findMessage("duplicatedTimeoff").replace('{date}', data[0].timeoff) });
+          } else {
+            return Timeoff.create({
+              employee_id: employee_id,
+              absenteeism_id: absenteeism_id,
+              date: date
+            })
+              .then(timeoff => res.status(201).json(timeoff))
+              .catch(error => {
+                if (error.name === "SequelizeUniqueConstraintError") {
+                  res.json({ error: true, message: findMessage("inUse") });
+                } else {
+                  res.status(400).send(error);
+                }
+              });
+          }
+        });
+    } else {
+      return Timeoff.create({
+        employee_id: employee_id,
+        absenteeism_id: absenteeism_id,
+        date: date
+      })
+        .then(timeoff => res.status(201).json(timeoff))
+        .catch(error => {
+          if (error.name === "SequelizeUniqueConstraintError") {
+            res.json({ error: true, message: findMessage("inUse") });
+          } else {
+            res.status(400).send(error);
+          }
+        });
+    }
   },
 
   findAll (req, res) {
