@@ -7,25 +7,50 @@ const config = require(path.join(__dirname, "..", "config", "config.json"))[
   env
 ];
 const seq = new sequelize(config.database, config.username, config.password, config);
+const errorMessage = [
+  {
+    key: "lowRestingTime",
+    value: "Este empleado ha trabado ayer y le estás dando sólo ({hours}) horas de descanso"
+  }
+];
+const findMessage = key => {
+  const result = errorMessage.find(item => {
+    return item.key === key;
+  });
+  return result.value;
+};
 
 module.exports = {
   create (req, res) {
+    const budget_id = req.body.budget_id
+    const employee_id = req.body.employee_id
     const from = parseInt(req.body.from)
     let to = parseInt(req.body.to)
     to = to < from ? to + 24 : to
-    Schedule.create({
-      budget_id: req.body.budget_id,
-      employee_id: req.body.employee_id,
-      position_id: req.body.position_id,
-      from: from,
-      to: to
-    })
-      .then(schedule => {
-        const query = `call update_total_hours(${req.body.budget_id})`
-        seq.query(query)
-        res.status(201).json(schedule)
+
+    const query = `call ensure_rest_time(${budget_id},${employee_id},${from});`
+    seq.query(query)
+      .then(data => {
+        if (data.length && parseInt(data[0].rest_time) < 8) {
+          res.json({ error: true, message: findMessage("lowRestingTime").replace('{hours}', data[0].rest_time) });
+        } else {
+          Schedule.create({
+            budget_id: budget_id,
+            employee_id: employee_id,
+            position_id: req.body.position_id,
+            from: from,
+            to: to
+          })
+            .then(schedule => {
+              const query = `call update_total_hours(${req.body.budget_id})`
+              seq.query(query)
+              res.status(201).json(schedule)
+            })
+            .catch(error => res.status(400).send(error));
+
+        }
       })
-      .catch(error => res.status(400).send(error));
+
   },
   findByBudget (req, res) {
     const Budget = require("../models").budget;
