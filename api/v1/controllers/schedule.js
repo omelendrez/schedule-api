@@ -8,10 +8,6 @@ const config = require(path.join(__dirname, "..", "config", "config.json"))[
 ];
 const seq = new sequelize(config.database, config.username, config.password, config);
 
-const ERROR = 1;
-const WARNING = 2;
-const OK = 0;
-
 module.exports = {
   create (req, res) {
     const from = parseInt(req.body.from)
