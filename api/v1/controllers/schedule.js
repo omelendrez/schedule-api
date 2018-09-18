@@ -1,29 +1,12 @@
 "use strict";
 const Schedule = require("../models").schedule;
 const sequelize = require("sequelize");
-
-const ERROR = 1;
-const WARNING = 2;
-const OK = 0;
-
-const updateTotals = (budget_id) => {
-  const mysql = require("mysql2");
-  const path = require("path");
-  const env = process.env.NODE_ENV || "development";
-  const config = require(path.join(__dirname, "..", "config", "config.json"))[
-    env
-  ];
-  const con = mysql.createConnection({
-    host: config.host,
-    user: config.username,
-    password: config.password,
-    database: config.database
-  });
-  con.connect(() => {
-    let query = `call update_total_hours(${budget_id})`
-    con.query(query)
-  })
-}
+const path = require("path");
+const env = process.env.NODE_ENV || "development";
+const config = require(path.join(__dirname, "..", "config", "config.json"))[
+  env
+];
+const seq = new sequelize(config.database, config.username, config.password, config);
 
 module.exports = {
   create (req, res) {
@@ -38,112 +21,11 @@ module.exports = {
       to: to
     })
       .then(schedule => {
-        updateTotals(req.body.budget_id)
+        const query = `call update_total_hours(${req.body.budget_id})`
+        seq.query(query)
         res.status(201).json(schedule)
       })
       .catch(error => res.status(400).send(error));
-  },
-  verifyInput (req, res) {
-    const mysql = require("mysql2");
-    const path = require("path");
-    const env = process.env.NODE_ENV || "development";
-    const config = require(path.join(__dirname, "..", "config", "config.json"))[
-      env
-    ];
-
-    const from = parseInt(req.body.from)
-    let to = parseInt(req.body.to)
-    to = to < from ? to + 24 : to
-
-    const con = mysql.createConnection({
-      host: config.host,
-      user: config.username,
-      password: config.password,
-      database: config.database
-    });
-    con.connect(() => {
-      let query = `call check_overwrite(${req.body.id},${from},${to},${req.body.budget_id}, ${req.body.employee_id})`
-      con.query(query, (err, schedule) => {
-        if (schedule[0][0]) {
-          res.json({
-            error: {
-              type: ERROR,
-              schedule: schedule,
-              message: schedule ? `${schedule[0][0].first_name} ya está asignado para este día de ${schedule[0][0].from}hs. a ${schedule[0][0].to}hs.` : ""
-            }
-          });
-        } else {
-          let hours = 0;
-          let query = `SELECT coalesce(sum(schedule.to-schedule.from),0) as hours FROM schedule WHERE id = ${req.body.id} LIMIT 1;`;
-          con.query(query, (err, schedule) => {
-            if (schedule) {
-              hours = schedule[0].hours;
-            }
-            let query = `SELECT coalesce(sum(schedule.to-schedule.from),0)+${(to - from) - hours} as hours FROM schedule WHERE budget_id = ${req.body.budget_id} AND employee_id = ${req.body.employee_id} LIMIT 1;`;
-            con.query(query, (err, schedule) => {
-              const hours = schedule[0].hours;
-              if (parseInt(hours) < 4) {
-                res.json({
-                  error: {
-                    type: WARNING,
-                    schedule: schedule,
-                    message: schedule
-                      ? `El empleado tiene menos de 4 horas trabajadas (${hours} horas)`
-                      : ""
-                  }
-                });
-              } else {
-                if (parseInt(hours) > 8) {
-                  res.json({
-                    error: {
-                      type: WARNING,
-                      schedule: schedule,
-                      message: schedule
-                        ? `El empleado tiene más de 8 horas trabajadas en el día (${hours} horas)`
-                        : ""
-                    }
-                  });
-                } else {
-                  let query = `call check_blocked(${from},${to},${req.body.budget_id}, ${req.body.employee_id})`
-                  con.query(query, (err, schedule) => {
-                    if (schedule[0][0]) {
-                      res.json({
-                        error: {
-                          type: WARNING,
-                          schedule: schedule,
-                          message: schedule ? `${schedule[0][0].first_name} tiene bloqueado de ${schedule[0][0].from}hs. a ${schedule[0][0].to}hs. para este día de la semana` : ""
-                        }
-                      });
-                    } else {
-                      let query = `select 1 from timeoff where employee_id = ${req.body.employee_id} and date = '${req.body.date}'`
-                      con.query(query, (err, schedule) => {
-                        if (schedule[0]) {
-                          res.json({
-                            error: {
-                              type: WARNING,
-                              schedule: schedule,
-                              message: schedule ? `El empleado está de FRANCO en este día` : ""
-                            }
-                          });
-                        } else {
-                          res.json({
-                            error: {
-                              type: OK,
-                              schedule: schedule,
-                              message: ""
-                            }
-                          });
-                        }
-                      })
-                    }
-                  })
-                }
-              }
-            });
-          });
-        }
-      });
-    });
   },
   findByBudget (req, res) {
     const Budget = require("../models").budget;
@@ -431,7 +313,8 @@ module.exports = {
             to: to
           })
           .then(result => {
-            updateTotals(req.body.budget_id)
+            const query = `call update_total_hours(${req.body.budget_id})`
+            seq.query(query)
             res.json(result);
           })
       )
@@ -446,7 +329,8 @@ module.exports = {
       .then(schedule => {
         const budget_id = schedule.budget_id
         schedule.destroy().then(() => {
-          updateTotals(budget_id)
+          const query = `call update_total_hours(${budget_id})`
+          seq.query(query)
           res.json({ status: true });
         })
       }
@@ -454,28 +338,14 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
   findTimeoff (req, res) {
-    const mysql = require("mysql2");
-    const path = require("path");
-    const env = process.env.NODE_ENV || "development";
-    const config = require(path.join(__dirname, "..", "config", "config.json"))[
-      env
-    ];
-
-    const con = mysql.createConnection({
-      host: config.host,
-      user: config.username,
-      password: config.password,
-      database: config.database
-    });
-    con.connect(() => {
-      const query = `call get_presence(${req.params.budget_id})`
-      con.query(query, (err, timeoff) => {
+    const query = `call get_presence(${req.params.budget_id})`
+    seq.query(query)
+      .then(timeoff => {
         if (timeoff) {
-          res.json(timeoff[0]);
+          res.json(timeoff);
         } else {
           res.json([]);
         }
       })
-    })
   }
 };
