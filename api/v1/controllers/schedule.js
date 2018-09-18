@@ -11,6 +11,10 @@ const errorMessage = [
   {
     key: "lowRestingTime",
     value: "Este empleado ha trabado ayer y le estás dando sólo ({hours}) horas de descanso"
+  },
+  {
+    key: "mustBeOnTimeoff",
+    value: "Este empleado debería estar de franco en este día"
   }
 ];
 const findMessage = key => {
@@ -27,8 +31,7 @@ module.exports = {
     const from = parseInt(req.body.from)
     let to = parseInt(req.body.to)
     to = to < from ? to + 24 : to
-
-    const query = `call ensure_rest_time(${budget_id},${employee_id},${from});`
+    let query = `call ensure_rest_time(${budget_id},${employee_id},${from});`
     seq.query(query)
       .then(data => {
         if (data.length && parseInt(data[0].rest_time) < 8) {
@@ -42,15 +45,26 @@ module.exports = {
             to: to
           })
             .then(schedule => {
-              const query = `call update_total_hours(${req.body.budget_id})`
+              let warnings = null
+              query = `call update_total_hours(${req.body.budget_id})`
               seq.query(query)
-              res.status(201).json(schedule)
+                .then(() => {
+                  query = `call verify_worked_days(${budget_id},${employee_id});`
+                  seq.query(query)
+                    .then(worked_time => {
+                      if (worked_time.length === 6) {
+                        warnings = {
+                          warning: true,
+                          message: findMessage("mustBeOnTimeoff")
+                        }
+                      }
+                      res.status(201).json({ schedule, warnings });
+                    })
+                })
             })
             .catch(error => res.status(400).send(error));
-
         }
       })
-
   },
   findByBudget (req, res) {
     const Budget = require("../models").budget;
