@@ -34,7 +34,7 @@ module.exports = {
     let query = `call ensure_rest_time(${budget_id},${employee_id},${from});`
     seq.query(query)
       .then(data => {
-        if (data.length && parseInt(data[0].rest_time) < 8) {
+        if (data[0].week_day && parseInt(data[0].rest_time) < (data[0].week_day < 4) ? 9 : 10) {
           res.json({ error: true, message: findMessage("lowRestingTime").replace('{hours}', data[0].rest_time) });
         } else {
           Schedule.create({
