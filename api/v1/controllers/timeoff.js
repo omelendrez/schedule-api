@@ -16,6 +16,10 @@ const errorMessage = [
   {
     key: "duplicatedTimeoff",
     value: "Este empleado ya tiene un franco cargado en esa semana ({date})"
+  },
+  {
+    key: "dateOutOfPeriod",
+    value: "La fecha que estás cargando es muy lejana ({date})"
   }
 ];
 const findMessage = key => {
@@ -36,7 +40,7 @@ module.exports = {
       seq.query(query)
         .then(data => {
           if (data.length) {
-            res.json({ warning: true, message: findMessage("duplicatedTimeoff").replace('{date}', data[0].timeoff) });
+            res.json({ warning: true, message: findMessage(data[0].error_code).replace('{date}', data[0].timeoff) });
           } else {
             return Timeoff.create({
               employee_id: employee_id,
