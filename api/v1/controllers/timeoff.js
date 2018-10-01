@@ -40,8 +40,8 @@ module.exports = {
       seq.query(query)
         .then(data => {
           console.log(data)
-          if (data.length && data.error_code) {
-            res.json({ warning: true, message: findMessage(data.error_code).replace('{date}', data.timeoff) });
+          if (data.length && data[0].error_code) {
+            res.json({ warning: true, message: findMessage(data[0].error_code).replace('{date}', data[0].timeoff) });
           } else {
             return Timeoff.create({
               employee_id: employee_id,
