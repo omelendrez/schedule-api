@@ -29,16 +29,22 @@ module.exports = {
     const budget_id = req.body.budget_id
     const employee_id = req.body.employee_id
     const from = parseInt(req.body.from)
+    const forced = req.body.forced
     let to = parseInt(req.body.to)
     to = to < from ? to + 24 : to
+
     let query = `call ensure_rest_time(${budget_id},${employee_id},${from});`
     seq.query(query)
       .then(data => {
         const restedHours = data[0].rest_time || 10
         const allowedRestHours = (data[0].week_day < 4) ? 9 : 10
 
-        if(restedHours < allowedRestHours) {
-          res.json({ error: true, message: findMessage("lowRestingTime").replace('{hours}', data[0].rest_time) });
+        if (restedHours < allowedRestHours && !forced) {
+          const warnings = {
+            warning: true,
+            message: findMessage("lowRestingTime").replace('{hours}', data[0].rest_time)
+          }
+          res.json({ warnings });
         } else {
           Schedule.create({
             budget_id: budget_id,
@@ -55,7 +61,7 @@ module.exports = {
                   query = `call verify_worked_days(${budget_id},${employee_id});`
                   seq.query(query)
                     .then(worked_time => {
-                      if (worked_time.length === 6) {
+                      if (worked_time.length === 6 && !forced) {
                         warnings = {
                           warning: true,
                           message: findMessage("mustBeOnTimeoff")
