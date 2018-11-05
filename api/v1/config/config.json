@@ -1,24 +1,11 @@
 {
   "development": {
-    "username": "escng_schedule",
-    "password": "M1a4$1t4E8r0",
-    "database": "escng_schedule",
+    "username": "root",
+    "password": "",
+    "database": "heroku_43e6ebe3dd474ec",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "define": {
-      "charset": "utf8",
-      "collate": "utf8_general_ci",
-      "freezeTableName": true,
-      "underscored": true
-    },
-    "timezone": "-03:00"
-  },
-  "test": {
-    "username": "escng_schedule",
-    "password": "M1a4$1t4E8r0",
-    "database": "escng_schedule",
-    "host": "127.0.0.1",
-    "dialect": "mysql",
+    "logging": false,
     "define": {
       "charset": "utf8",
       "collate": "utf8_general_ci",
@@ -33,6 +20,7 @@
     "database": "heroku_43e6ebe3dd474ec",
     "host": "us-cdbr-iron-east-05.cleardb.net",
     "dialect": "mysql",
+    "logging": false,
     "define": {
       "charset": "utf8",
       "collate": "utf8_general_ci",
