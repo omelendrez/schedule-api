@@ -13,7 +13,7 @@ app.use(
     extended: true
   })
 );
-app.use(logger("combined"));
+app.use(logger("dev"));
 
 models.sequelize.sync({
   force: false

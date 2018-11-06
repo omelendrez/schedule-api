@@ -395,5 +395,30 @@ module.exports = {
           res.json([]);
         }
       })
+  },
+  getReport (req, res) {
+    const query = `select se.name as sector, p.name as position, sum(total) as total from schedule as s
+    inner join budget as b on s.budget_id = b.id
+    inner join position as p on s.position_id = p.id
+    inner join sector as se on p.sector_id = se.id
+    where b.date between '${req.params.date_from}' and '${req.params.date_to}'
+    group by se.name, p.name;`
+    seq.query(query)
+      .then(result => {
+        const all = result[0]
+        const query = `select se.name as sector, sum(total) as total from schedule as s
+        inner join budget as b on s.budget_id = b.id
+        inner join position as p on s.position_id = p.id
+        inner join sector as se on p.sector_id = se.id
+        where b.date between '${req.params.date_from}' and '${req.params.date_to}'
+        group by se.name;`
+        seq.query(query)
+          .then(result => {
+            const sector = result[0]
+            res.json({ sector: sector, all: all })
+          })
+          .catch(error => res.status(400).send(error))
+      })
+      .catch(error => res.status(400).send(error))
   }
 };
