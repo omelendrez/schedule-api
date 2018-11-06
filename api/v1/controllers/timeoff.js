@@ -39,7 +39,6 @@ module.exports = {
       const query = `call verify_timeoff(${employee_id},'${date}')`
       seq.query(query)
         .then(data => {
-          console.log(data)
           if (data.length && data[0].error_code) {
             res.json({ warning: true, message: findMessage(data[0].error_code).replace('{date}', data[0].timeoff) });
           } else {
