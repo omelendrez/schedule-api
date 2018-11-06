@@ -396,7 +396,8 @@ module.exports = {
         }
       })
   },
-  getReport (req, res) {
+
+  getConsumedBySectorReport (req, res) {
     const query = `select se.name as sector, p.name as position, sum(total) as total from schedule as s
     inner join budget as b on s.budget_id = b.id
     inner join position as p on s.position_id = p.id
@@ -416,6 +417,29 @@ module.exports = {
           .then(result => {
             const sector = result[0]
             res.json({ sector: sector, all: all })
+          })
+          .catch(error => res.status(400).send(error))
+      })
+      .catch(error => res.status(400).send(error))
+  },
+
+  getBudgetVsConsumed (req, res) {
+    const query = `select year(b.date) as year, DATE_FORMAT(b.date, '%m-%Y') as month, sum(b.hours) as hours
+    from budget as b
+    where datediff(now(), b.date) < 180
+    group by year(b.date), DATE_FORMAT(b.date, '%m-%Y'), month(b.date);`
+    seq.query(query)
+      .then(result => {
+        const budget = result[0]
+        const query = `select year(b.date) as year, DATE_FORMAT(b.date, '%m-%Y')  as month, sum(s.total) as total
+        from budget as b
+        inner join schedule as s on s.budget_id = b.id
+        where datediff(now(), b.date) < 180
+        group by year(b.date), DATE_FORMAT(b.date, '%m-%Y');`
+        seq.query(query)
+          .then(result => {
+            const actual = result[0]
+            res.json({ actual: actual, budget: budget })
           })
           .catch(error => res.status(400).send(error))
       })
