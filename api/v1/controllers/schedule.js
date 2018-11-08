@@ -397,52 +397,36 @@ module.exports = {
       })
   },
 
-  getConsumedBySectorReport (req, res) {
-    const query = `select se.name as sector, p.name as position, sum(total) as total from schedule as s
+  async getConsumedBySectorReport (req, res) {
+    let query = `select se.name as sector, p.name as position, sum(total) as total from schedule as s
     inner join budget as b on s.budget_id = b.id
     inner join position as p on s.position_id = p.id
     inner join sector as se on p.sector_id = se.id
     where b.date between '${req.params.date_from}' and '${req.params.date_to}'
     group by se.name, p.name;`
-    seq.query(query)
-      .then(result => {
-        const all = result[0]
-        const query = `select se.name as sector, sum(total) as total from schedule as s
-        inner join budget as b on s.budget_id = b.id
-        inner join position as p on s.position_id = p.id
-        inner join sector as se on p.sector_id = se.id
-        where b.date between '${req.params.date_from}' and '${req.params.date_to}'
-        group by se.name;`
-        seq.query(query)
-          .then(result => {
-            const sector = result[0]
-            res.json({ sector: sector, all: all })
-          })
-          .catch(error => res.status(400).send(error))
-      })
-      .catch(error => res.status(400).send(error))
+    const all = await seq.query(query)
+    query = `select se.name as sector, sum(total) as total from schedule as s
+    inner join budget as b on s.budget_id = b.id
+    inner join position as p on s.position_id = p.id
+    inner join sector as se on p.sector_id = se.id
+    where b.date between '${req.params.date_from}' and '${req.params.date_to}'
+    group by se.name;`
+    const sector = await seq.query(query)
+    res.json({ sector: sector[0], all: all[0] })
   },
 
-  getBudgetVsConsumed (req, res) {
-    const query = `select year(b.date) as year, DATE_FORMAT(b.date, '%m-%Y') as month, sum(b.hours) as hours
+  async getBudgetVsConsumed (req, res) {
+    let query = `select year(b.date) as year, DATE_FORMAT(b.date, '%m-%Y') as month, sum(b.hours) as hours
     from budget as b
     where datediff(now(), b.date) < 180
     group by year(b.date), DATE_FORMAT(b.date, '%m-%Y'), month(b.date);`
-    seq.query(query)
-      .then(result => {
-        const budget = result[0]
-        const query = `select year(b.date) as year, DATE_FORMAT(b.date, '%m-%Y')  as month, sum(s.total) as total
-        from budget as b
-        inner join schedule as s on s.budget_id = b.id
-        where datediff(now(), b.date) < 180
-        group by year(b.date), DATE_FORMAT(b.date, '%m-%Y');`
-        seq.query(query)
-          .then(result => {
-            const actual = result[0]
-            res.json({ actual: actual, budget: budget })
-          })
-          .catch(error => res.status(400).send(error))
-      })
-      .catch(error => res.status(400).send(error))
+    const budget = await seq.query(query)
+    query = `select year(b.date) as year, DATE_FORMAT(b.date, '%m-%Y')  as month, sum(s.total) as total
+    from budget as b
+    inner join schedule as s on s.budget_id = b.id
+    where datediff(now(), b.date) < 180
+    group by year(b.date), DATE_FORMAT(b.date, '%m-%Y');`
+    const actual = await seq.query(query)
+    res.json({ actual: actual[0], budget: budget[0] })
   }
 };
