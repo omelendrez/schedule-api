@@ -418,9 +418,12 @@ module.exports = {
   async getBudgetVsConsumed (req, res) {
     const query = require('./../utils/query.json').budgetVsConsumed
 
-    const budget = await seq.query(query.budget)
-    const actual = await seq.query(query.actual)
+    const budgetMonthly = await seq.query(query.budgetMonthly)
+    const actualMonthly = await seq.query(query.actualMonthly)
 
-    res.json({ actual: actual[0], budget: budget[0] })
+    const budgetDaily = await seq.query(query.budgetDaily)
+    const actualDaily = await seq.query(query.actualDaily)
+
+    res.json({ monthly: { actual: actualMonthly[0], budget: budgetMonthly[0] }, daily: { actual: actualDaily[0], budget: budgetDaily[0] } })
   }
 };
