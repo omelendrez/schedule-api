@@ -398,35 +398,31 @@ module.exports = {
   },
 
   async getConsumedBySectorReport (req, res) {
-    let query = `select se.name as sector, p.name as position, sum(total) as total from schedule as s
-    inner join budget as b on s.budget_id = b.id
-    inner join position as p on s.position_id = p.id
-    inner join sector as se on p.sector_id = se.id
-    where b.date between '${req.params.date_from}' and '${req.params.date_to}'
-    group by se.name, p.name;`
-    const all = await seq.query(query)
-    query = `select se.name as sector, sum(total) as total from schedule as s
-    inner join budget as b on s.budget_id = b.id
-    inner join position as p on s.position_id = p.id
-    inner join sector as se on p.sector_id = se.id
-    where b.date between '${req.params.date_from}' and '${req.params.date_to}'
-    group by se.name;`
-    const sector = await seq.query(query)
+    const query = require('./../utils/query.json').consumedBySectorReport
+
+    let sql = query.all
+      .split('{{dateFrom}}')
+      .join(req.params.date_from)
+      .split('{{dateTo}}')
+      .join(req.params.date_to)
+    const all = await seq.query(sql)
+
+    sql = query.sector
+      .split('{{dateFrom}}')
+      .join(req.params.date_from)
+      .split('{{dateTo}}')
+      .join(req.params.date_to)
+    const sector = await seq.query(sql)
+
     res.json({ sector: sector[0], all: all[0] })
   },
 
   async getBudgetVsConsumed (req, res) {
-    let query = `select year(b.date) as year, DATE_FORMAT(b.date, '%m-%Y') as month, sum(b.hours) as hours
-    from budget as b
-    where datediff(now(), b.date) < 180
-    group by year(b.date), DATE_FORMAT(b.date, '%m-%Y'), month(b.date);`
-    const budget = await seq.query(query)
-    query = `select year(b.date) as year, DATE_FORMAT(b.date, '%m-%Y')  as month, sum(s.total) as total
-    from budget as b
-    inner join schedule as s on s.budget_id = b.id
-    where datediff(now(), b.date) < 180
-    group by year(b.date), DATE_FORMAT(b.date, '%m-%Y');`
-    const actual = await seq.query(query)
+    const query = require('./../utils/query.json').budgetVsConsumed
+
+    const budget = await seq.query(query.budget)
+    const actual = await seq.query(query.actual)
+
     res.json({ actual: actual[0], budget: budget[0] })
   }
 };
