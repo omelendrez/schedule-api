@@ -401,17 +401,15 @@ module.exports = {
     const query = require('./../utils/query.json').consumedBySectorReport
 
     let sql = query.all
-      .split('{{dateFrom}}')
-      .join(req.params.date_from)
-      .split('{{dateTo}}')
-      .join(req.params.date_to)
+      .split('{{dateFrom}}').join(req.params.date_from)
+      .split('{{dateTo}}').join(req.params.date_to)
+
     const all = await seq.query(sql)
 
     sql = query.sector
-      .split('{{dateFrom}}')
-      .join(req.params.date_from)
-      .split('{{dateTo}}')
-      .join(req.params.date_to)
+      .split('{{dateFrom}}').join(req.params.date_from)
+      .split('{{dateTo}}').join(req.params.date_to)
+
     const sector = await seq.query(sql)
 
     res.json({ sector: sector[0], all: all[0] })
