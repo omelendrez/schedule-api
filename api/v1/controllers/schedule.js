@@ -6,11 +6,17 @@ const env = process.env.NODE_ENV || "development";
 const config = require(path.join(__dirname, "..", "config", "config.json"))[
   env
 ];
-const seq = new sequelize(config.database, config.username, config.password, config);
+const seq = new sequelize(
+  config.database,
+  config.username,
+  config.password,
+  config
+);
 const errorMessage = [
   {
     key: "lowRestingTime",
-    value: "Este empleado ha trabado ayer y le estás dando sólo ({hours}) horas de descanso"
+    value:
+      "Este empleado ha trabado ayer y le estás dando sólo ({hours}) horas de descanso"
   },
   {
     key: "mustBeOnTimeoff",
@@ -25,57 +31,57 @@ const findMessage = key => {
 };
 
 module.exports = {
-  create (req, res) {
-    const budget_id = req.body.budget_id
-    const employee_id = req.body.employee_id
-    const from = parseInt(req.body.from)
-    const forced = req.body.forced
-    let to = parseInt(req.body.to)
-    to = to < from ? to + 24 : to
+  create(req, res) {
+    const budget_id = req.body.budget_id;
+    const employee_id = req.body.employee_id;
+    const from = parseInt(req.body.from);
+    const forced = req.body.forced;
+    let to = parseInt(req.body.to);
+    to = to < from ? to + 24 : to;
 
-    let query = `call ensure_rest_time(${budget_id},${employee_id},${from});`
-    seq.query(query)
-      .then(data => {
-        const restedHours = data[0].rest_time || 10
-        const allowedRestHours = (data[0].week_day < 4) ? 9 : 10
+    let query = `call ensure_rest_time(${budget_id},${employee_id},${from});`;
+    seq.query(query).then(data => {
+      const restedHours = data[0].rest_time || 10;
+      const allowedRestHours = data[0].week_day < 4 ? 9 : 10;
 
-        if (restedHours < allowedRestHours && !forced) {
-          const warnings = {
-            warning: true,
-            message: findMessage("lowRestingTime").replace('{hours}', data[0].rest_time)
-          }
-          res.json({ warnings });
-        } else {
-          Schedule.create({
-            budget_id: budget_id,
-            employee_id: employee_id,
-            position_id: req.body.position_id,
-            from: from,
-            to: to
+      if (restedHours < allowedRestHours && !forced) {
+        const warnings = {
+          warning: true,
+          message: findMessage("lowRestingTime").replace(
+            "{hours}",
+            data[0].rest_time
+          )
+        };
+        res.json({ warnings });
+      } else {
+        Schedule.create({
+          budget_id: budget_id,
+          employee_id: employee_id,
+          position_id: req.body.position_id,
+          from: from,
+          to: to
+        })
+          .then(schedule => {
+            let warnings = null;
+            query = `call update_total_hours(${req.body.budget_id})`;
+            seq.query(query).then(() => {
+              query = `call verify_worked_days(${budget_id},${employee_id});`;
+              seq.query(query).then(worked_time => {
+                if (worked_time.length === 6 && !forced) {
+                  warnings = {
+                    warning: true,
+                    message: findMessage("mustBeOnTimeoff")
+                  };
+                }
+                res.status(201).json({ schedule, warnings });
+              });
+            });
           })
-            .then(schedule => {
-              let warnings = null
-              query = `call update_total_hours(${req.body.budget_id})`
-              seq.query(query)
-                .then(() => {
-                  query = `call verify_worked_days(${budget_id},${employee_id});`
-                  seq.query(query)
-                    .then(worked_time => {
-                      if (worked_time.length === 6 && !forced) {
-                        warnings = {
-                          warning: true,
-                          message: findMessage("mustBeOnTimeoff")
-                        }
-                      }
-                      res.status(201).json({ schedule, warnings });
-                    })
-                })
-            })
-            .catch(error => res.status(400).send(error));
-        }
-      })
+          .catch(error => res.status(400).send(error));
+      }
+    });
   },
-  findByBudget (req, res) {
+  findByBudget(req, res) {
     const Budget = require("../models").budget;
     const Employee = require("../models").employee;
     const Position = require("../models").position;
@@ -125,11 +131,11 @@ module.exports = {
               budget_id: budget.id
             },
             order: [
-              [Employee, 'last_name', 'ASC'],
-              [Employee, 'first_name', 'ASC'],
-              ['from', 'ASC'],
-              [Position, 'sector_id', 'ASC'],
-              [Position, 'name', 'ASC']
+              [Employee, "last_name", "ASC"],
+              [Employee, "first_name", "ASC"],
+              ["from", "ASC"],
+              [Position, "sector_id", "ASC"],
+              [Position, "name", "ASC"]
             ],
             attributes: [
               "id",
@@ -181,14 +187,13 @@ module.exports = {
               }
             ]
           })
-            .then(
-              schedule =>
-                schedule
-                  ? res.json({
+            .then(schedule =>
+              schedule
+                ? res.json({
                     schedule: schedule,
                     budget: { rows: budget, count: 1 }
                   })
-                  : res.json({
+                : res.json({
                     budget: { rows: budget, count: 1 },
                     schedule: { count: 0, rows: [] }
                   })
@@ -203,19 +208,19 @@ module.exports = {
       })
       .catch(error => res.status(400).send(error));
   },
-  findSchedule (req, res) {
+  findSchedule(req, res) {
     const Budget = require("../models").budget;
     const Employee = require("../models").employee;
     const Position = require("../models").position;
     const Branch = require("../models").branch;
     const Availability = require("../models").availability;
     const Timeoff = require("../models").timeoff;
-    const Absenteeism = require("../models").absenteeism
+    const Absenteeism = require("../models").absenteeism;
 
-    Employee.hasMany(Schedule)
-    Employee.hasMany(Timeoff)
-    Timeoff.belongsTo(Absenteeism)
-    Employee.hasMany(Availability)
+    Employee.hasMany(Schedule);
+    Employee.hasMany(Timeoff);
+    Timeoff.belongsTo(Absenteeism);
+    Employee.hasMany(Availability);
     Schedule.belongsTo(Position);
     Budget.belongsTo(Branch);
 
@@ -256,10 +261,7 @@ module.exports = {
               branch_id: budget.branch_id,
               status_id: 1
             },
-            order: [
-              ['last_name', 'ASC'],
-              ['first_name', 'ASC']
-            ],
+            order: [["last_name", "ASC"], ["first_name", "ASC"]],
             attributes: ["id", "badge", "first_name", "last_name"],
             include: [
               {
@@ -267,11 +269,7 @@ module.exports = {
                 where: {
                   employee_id: sequelize.col("employee.id")
                 },
-                attributes: [
-                  "week_day",
-                  "from",
-                  "to"
-                ],
+                attributes: ["week_day", "from", "to"],
                 required: false
               },
               {
@@ -296,17 +294,8 @@ module.exports = {
                   employee_id: sequelize.col("employee.id"),
                   budget_id: budget.id
                 },
-                attributes: [
-                  "id",
-                  "budget_id",
-                  "from",
-                  "to",
-                  "position_id"
-                ],
-                order: [
-                  "from",
-                  "to"
-                ],
+                attributes: ["id", "budget_id", "from", "to", "position_id"],
+                order: ["from", "to"],
                 required: false,
                 include: [
                   {
@@ -320,14 +309,13 @@ module.exports = {
               }
             ]
           })
-            .then(
-              schedule =>
-                schedule
-                  ? res.json({
+            .then(schedule =>
+              schedule
+                ? res.json({
                     schedule: schedule,
                     budget: { rows: budget, count: 1 }
                   })
-                  : res.json({
+                : res.json({
                     budget: { rows: budget, count: 1 },
                     schedule: { count: 0, rows: [] }
                   })
@@ -342,10 +330,10 @@ module.exports = {
       })
       .catch(error => res.status(400).send(error));
   },
-  update (req, res) {
-    const from = parseInt(req.body.from)
-    let to = parseInt(req.body.to)
-    to = to < from ? to + 24 : to
+  update(req, res) {
+    const from = parseInt(req.body.from);
+    let to = parseInt(req.body.to);
+    to = to < from ? to + 24 : to;
     return Schedule.findOne({
       where: {
         id: req.params.id
@@ -361,69 +349,70 @@ module.exports = {
             to: to
           })
           .then(result => {
-            const query = `call update_total_hours(${req.body.budget_id})`
-            seq.query(query)
+            const query = `call update_total_hours(${req.body.budget_id})`;
+            seq.query(query);
             res.json(result);
           })
       )
       .catch(error => res.status(400).send(error));
   },
-  delete (req, res) {
+  delete(req, res) {
     return Schedule.findOne({
       where: {
         id: req.params.id
       }
     })
       .then(schedule => {
-        const budget_id = schedule.budget_id
+        const budget_id = schedule.budget_id;
         schedule.destroy().then(() => {
-          const query = `call update_total_hours(${budget_id})`
-          seq.query(query)
+          const query = `call update_total_hours(${budget_id})`;
+          seq.query(query);
           res.json({ status: true });
-        })
-      }
-      )
+        });
+      })
       .catch(error => res.status(400).send(error));
   },
-  findTimeoff (req, res) {
-    const query = `call get_presence(${req.params.budget_id})`
-    seq.query(query)
-      .then(timeoff => {
-        if (timeoff) {
-          res.json(timeoff);
-        } else {
-          res.json([]);
-        }
-      })
+  findTimeoff(req, res) {
+    const query = `call get_presence(${req.params.budget_id})`;
+    seq.query(query).then(timeoff => {
+      if (timeoff) {
+        res.json(timeoff);
+      } else {
+        res.json([]);
+      }
+    });
   },
 
-  async getConsumedBySectorReport (req, res) {
-    const query = require('./../utils/query.json').consumedBySectorReport
+  async getConsumedBySectorReport(req, res) {
+    const query = require("./../utils/query.json").consumedBySectorReport;
 
-    let sql = query.all
-      .split('{{dateFrom}}').join(req.params.date_from)
-      .split('{{dateTo}}').join(req.params.date_to)
+    const all = await seq.query(
+      query.all
+        .replace("{{dateFrom}}", req.params.date_from)
+        .replace("{{dateTo}}", req.params.date_to)
+    );
 
-    const all = await seq.query(sql)
+    const sector = await seq.query(
+      query.sector
+        .replace("{{dateFrom}}", req.params.date_from)
+        .replace("{{dateTo}}", req.params.date_to)
+    );
 
-    sql = query.sector
-      .split('{{dateFrom}}').join(req.params.date_from)
-      .split('{{dateTo}}').join(req.params.date_to)
-
-    const sector = await seq.query(sql)
-
-    res.json({ sector: sector[0], all: all[0] })
+    res.json({ sector: sector[0], all: all[0] });
   },
 
-  async getBudgetVsConsumed (req, res) {
-    const query = require('./../utils/query.json').budgetVsConsumed
+  async getBudgetVsConsumed(req, res) {
+    const query = require("./../utils/query.json").budgetVsConsumed;
 
-    const budgetMonthly = await seq.query(query.budgetMonthly)
-    const actualMonthly = await seq.query(query.actualMonthly)
+    const budgetMonthly = await seq.query(query.budgetMonthly);
+    const actualMonthly = await seq.query(query.actualMonthly);
 
-    const budgetDaily = await seq.query(query.budgetDaily)
-    const actualDaily = await seq.query(query.actualDaily)
+    const budgetDaily = await seq.query(query.budgetDaily);
+    const actualDaily = await seq.query(query.actualDaily);
 
-    res.json({ monthly: { actual: actualMonthly[0], budget: budgetMonthly[0] }, daily: { actual: actualDaily[0], budget: budgetDaily[0] } })
+    res.json({
+      monthly: { actual: actualMonthly[0], budget: budgetMonthly[0] },
+      daily: { actual: actualDaily[0], budget: budgetDaily[0] }
+    });
   }
 };
