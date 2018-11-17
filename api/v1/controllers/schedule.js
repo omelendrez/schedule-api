@@ -54,12 +54,14 @@ module.exports = {
         };
         res.json({ warnings });
       } else {
-        Schedule.create({
-          budget_id: budget_id,
-          employee_id: employee_id,
-          position_id: req.body.position_id,
-          from: from,
-          to: to
+        Schedule.findOrCreate({
+          where: {
+            budget_id: budget_id,
+            employee_id: employee_id,
+            position_id: req.body.position_id,
+            from: from,
+            to: to
+          }
         })
           .then(schedule => {
             let warnings = null;
