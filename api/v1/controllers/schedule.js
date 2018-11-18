@@ -21,6 +21,15 @@ const errorMessage = [
   {
     key: "mustBeOnTimeoff",
     value: "Este empleado debería estar de franco en este día"
+  },
+  {
+    key: "timeFrameBlocked",
+    value:
+      "{name} tiene bloqueado desde {from} hs. hasta {to} hs. para este día"
+  },
+  {
+    key: "exceededDailyHours",
+    value: "Le estás asignando más de {hours} horas trabajadas a {name}"
   }
 ];
 const findMessage = key => {
@@ -31,21 +40,22 @@ const findMessage = key => {
 };
 
 module.exports = {
-  create(req, res) {
+  async create(req, res) {
+    let warnings, data;
     const budget_id = req.body.budget_id;
     const employee_id = req.body.employee_id;
     const from = parseInt(req.body.from);
     const forced = req.body.forced;
     let to = parseInt(req.body.to);
     to = to < from ? to + 24 : to;
-
-    let query = `call ensure_rest_time(${budget_id},${employee_id},${from});`;
-    seq.query(query).then(data => {
-      const restedHours = data[0].rest_time || 10;
-      const allowedRestHours = data[0].week_day < 4 ? 9 : 10;
-
-      if (restedHours < allowedRestHours && !forced) {
-        const warnings = {
+    if (!forced) {
+      data = await seq.query(
+        `call ensure_rest_time(${budget_id},${employee_id},${from});`
+      );
+      const restTime = data[0].rest_time || 10;
+      const weekDay = data[0].week_day < 4 ? 9 : 10;
+      if (restTime < weekDay) {
+        warnings = {
           warning: true,
           message: findMessage("lowRestingTime").replace(
             "{hours}",
@@ -53,35 +63,68 @@ module.exports = {
           )
         };
         res.json({ warnings });
-      } else {
-        Schedule.findOrCreate({
-          where: {
-            budget_id: budget_id,
-            employee_id: employee_id,
-            position_id: req.body.position_id,
-            from: from,
-            to: to
-          }
-        })
-          .then(schedule => {
-            let warnings = null;
-            query = `call update_total_hours(${req.body.budget_id})`;
-            seq.query(query).then(() => {
-              query = `call verify_worked_days(${budget_id},${employee_id});`;
-              seq.query(query).then(worked_time => {
-                if (worked_time.length === 6 && !forced) {
-                  warnings = {
-                    warning: true,
-                    message: findMessage("mustBeOnTimeoff")
-                  };
-                }
-                res.status(201).json({ schedule, warnings });
-              });
-            });
+        return;
+      }
+
+      data = await seq.query(
+        `call check_blocked(${from},${to},${budget_id},${employee_id});`
+      );
+      if (data.length) {
+        warnings = {
+          warning: true,
+          message: findMessage("timeFrameBlocked")
+            .replace("{name}", data[0].first_name)
+            .replace("{from}", data[0].from)
+            .replace("{to}", data[0].to)
+        };
+        res.json({ warnings });
+        return;
+      }
+      data = await seq.query(
+        `call verify_worked_days(${budget_id},${employee_id});`
+      );
+      if (data.length === 5) {
+        warnings = {
+          warning: true,
+          message: findMessage("mustBeOnTimeoff")
+        };
+        res.json({ warnings });
+        return;
+      }
+
+      data = await seq.query(
+        `call sum_worked_hours(${budget_id},${employee_id});`
+      );
+      if (data.length && data[0].total > 7) {
+        warnings = {
+          warning: true,
+          message: findMessage("exceededDailyHours")
+            .replace("{name}", data[0].name)
+            .replace("{hours}", data[0].total)
+        };
+        res.json({ warnings });
+        return;
+      }
+    }
+    Schedule.findOrCreate({
+      where: {
+        budget_id: budget_id,
+        employee_id: employee_id,
+        position_id: req.body.position_id,
+        from: from,
+        to: to
+      }
+    })
+      .then(schedule => {
+        let warnings = null;
+        seq
+          .query(`call update_total_hours(${budget_id})`)
+          .then(() => {
+            res.status(201).json({ schedule, warnings });
           })
           .catch(error => res.status(400).send(error));
-      }
-    });
+      })
+      .catch(error => res.status(400).send(error));
   },
   findByBudget(req, res) {
     const Budget = require("../models").budget;
