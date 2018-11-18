@@ -1,5 +1,5 @@
 "use strict";
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   const Absenteeism = sequelize.define("absenteeism", {
     name: {
       type: DataTypes.STRING,
