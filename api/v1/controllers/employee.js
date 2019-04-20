@@ -62,18 +62,9 @@ module.exports = {
 
     const page = parseInt(req.query.page ? req.query.page : 0);
     const size = parseInt(req.query.size ? req.query.size : 1000);
-    const filter = req.query.filter ? req.query.filter : "";
 
     return Employee.findAndCountAll({
       raw: true,
-      where: {
-        last_name: {
-          $like: "%" + filter + "%"
-        },
-        first_name: {
-          $like: "%" + filter + "%"
-        }
-      },
       order: ["last_name", "first_name"],
       offset: size !== 1000 ? (page - 1) * size : 0,
       limit: size,

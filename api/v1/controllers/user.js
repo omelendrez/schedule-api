@@ -55,16 +55,10 @@ module.exports = {
     const size = parseInt(req.query.size ? req.query.size : 1000);
     const sort = req.query.sort ? req.query.sort : 'full_name';
     const type = req.query.type ? req.query.type : 'asc';
-    const filter = req.query.filter ? req.query.filter : '';
 
     return User
       .findAndCountAll({
         raw: true,
-        where: {
-          full_name: {
-            $like: '%' + filter + '%'
-          }
-        },
         order: [
           [sort, type]
         ],
@@ -107,7 +101,10 @@ module.exports = {
         ]
       })
       .then(users => res.json(users))
-      .catch(error => res.status(400).json(error));
+      .catch(error => {
+        console.log(error)
+        res.status(400).json(error)
+      });
   },
 
   findById(req, res) {

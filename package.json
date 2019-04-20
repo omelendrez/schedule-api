@@ -1,6 +1,6 @@
 {
   "name": "schedule-server-api",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Schedule backend",
   "main": "server.js",
   "engines": {
@@ -11,8 +11,8 @@
     "body-parser": "^1.15.2",
     "express": "^4.15.3",
     "morgan": "^1.9.0",
-    "mysql2": "^1.4.2",
-    "sequelize": "^4.8.3"
+    "mysql2": "^1.6.5",
+    "sequelize": "^5.7.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

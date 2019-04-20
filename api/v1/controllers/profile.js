@@ -18,15 +18,9 @@ module.exports = {
     const size = parseInt(req.query.size ? req.query.size : 1000);
     const sort = req.query.sort ? req.query.sort : 'name';
     const type = req.query.type ? req.query.type : 'asc';
-    const filter = req.query.filter ? req.query.filter : '';
 
     return Profile
       .findAndCountAll({
-        where: {
-          name: {
-            $like: '%' + filter + '%'
-          }
-        },
         order: [
           [sort, type]
         ],
