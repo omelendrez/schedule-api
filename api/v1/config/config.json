@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "M1a4$1t4E8r0",
-    "database": "heroku_43e6ebe3dd474ec",
+    "database": "escng_schedule",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "logging": false,
