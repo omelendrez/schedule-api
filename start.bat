@@ -1,3 +1,3 @@
-cd C:\webserver\schedule\schedule-api
+cd C:\webserver\turnera\schedule-api
 nodemon
 
