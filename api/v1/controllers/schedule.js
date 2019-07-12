@@ -30,6 +30,11 @@ const errorMessage = [
   {
     key: "exceededDailyHours",
     value: "Le estás asignando más de {hours} horas trabajadas a {name}"
+  },
+  {
+    key: "exceededMonthlyHours",
+    value:
+      "{name} ya ha trabado {hours} horas estel mes"
   }
 ];
 const findMessage = key => {
@@ -99,6 +104,21 @@ module.exports = {
         warnings = {
           warning: true,
           message: findMessage("exceededDailyHours")
+            .replace("{name}", data[0].name)
+            .replace("{hours}", data[0].total)
+        };
+        res.json({ warnings });
+        return;
+      }
+
+      data = await seq.query(
+        `call sum_worked_hours_month(${budget_id},${employee_id});`
+      );
+      console.log(data)
+      if (data.length && data[0].total > 160) {
+        warnings = {
+          warning: true,
+          message: findMessage("exceededMonthlyHours")
             .replace("{name}", data[0].name)
             .replace("{hours}", data[0].total)
         };
@@ -235,13 +255,13 @@ module.exports = {
             .then(schedule =>
               schedule
                 ? res.json({
-                    schedule: schedule,
-                    budget: { rows: budget, count: 1 }
-                  })
+                  schedule: schedule,
+                  budget: { rows: budget, count: 1 }
+                })
                 : res.json({
-                    budget: { rows: budget, count: 1 },
-                    schedule: { count: 0, rows: [] }
-                  })
+                  budget: { rows: budget, count: 1 },
+                  schedule: { count: 0, rows: [] }
+                })
             )
             .catch(error => res.status(400).send(error));
         } else {
@@ -357,13 +377,13 @@ module.exports = {
             .then(schedule =>
               schedule
                 ? res.json({
-                    schedule: schedule,
-                    budget: { rows: budget, count: 1 }
-                  })
+                  schedule: schedule,
+                  budget: { rows: budget, count: 1 }
+                })
                 : res.json({
-                    budget: { rows: budget, count: 1 },
-                    schedule: { count: 0, rows: [] }
-                  })
+                  budget: { rows: budget, count: 1 },
+                  schedule: { count: 0, rows: [] }
+                })
             )
             .catch(error => res.status(400).send(error));
         } else {
