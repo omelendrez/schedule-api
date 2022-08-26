@@ -455,6 +455,7 @@ module.exports = {
       );
     } catch (error) {
       console.log(error)
+      return res.json(error)
     }
 
     res.json({ sector: sector[0], all: all[0] });
