@@ -13,7 +13,7 @@
     "express": "^4.15.3",
     "morgan": "^1.9.0",
     "mysql2": "^1.6.5",
-    "sequelize": "^5.17.2"
+    "sequelize": "^5.22.5"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
