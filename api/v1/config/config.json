@@ -1,8 +1,8 @@
 {
   "development": {
-    "username": "escng_schedule_user",
+    "username": "turnera_user",
     "password": "M1a4$1t4E8r0",
-    "database": "heroku_43e6ebe3dd474ec",
+    "database": "turnera",
     "host": "localhost",
     "dialect": "mysql",
     "logging": false,
@@ -15,10 +15,7 @@
     "timezone": "-03:00"
   },
   "production": {
-    "username": "bd83a92a47dd0f",
-    "password": "2ea13061",
-    "database": "heroku_43e6ebe3dd474ec",
-    "host": "localhost",
+    "use_env_variable": "CLEARDB_DATABASE_URL",
     "dialect": "mysql",
     "logging": false,
     "define": {
