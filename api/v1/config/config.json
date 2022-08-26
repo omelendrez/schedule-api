@@ -5,13 +5,11 @@
     "database": "turnera",
     "host": "localhost",
     "dialect": "mysql",
-    "logging": false,
-    "timezone": "-03:00"
+    "logging": false
   },
   "production": {
     "use_env_variable": "CLEARDB_DATABASE_URL",
     "dialect": "mysql",
-    "logging": false,
-    "timezone": "-03:00"
+    "logging": false
   }
 }
