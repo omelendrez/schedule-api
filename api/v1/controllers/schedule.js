@@ -1,24 +1,7 @@
 "use strict";
 const Schedule = require("../models").schedule;
 const sequelize = require("sequelize");
-const path = require("path");
-const env = process.env.NODE_ENV || "development";
-const config = require(path.join(__dirname, "..", "config", "config.json"))[
-  env
-];
-let seq
-if (config.use_env_variable) {
-  seq = new Sequelize(process.env[config.use_env_variable], config)
-} else {
-  seq = new Sequelize(config.database, config.username, config.password, config)
-}
 
-// const seq = new sequelize(
-//   config.database,
-//   config.username,
-//   config.password,
-//   config
-// );
 const errorMessage = [
   {
     key: "lowRestingTime",
@@ -61,7 +44,7 @@ module.exports = {
     let to = parseInt(req.body.to);
     to = to < from ? to + 24 : to;
     if (!forced) {
-      data = await seq.query(
+      data = await sequelize.query(
         `call ensure_rest_time(${budget_id},${employee_id},${from});`
       );
       const restTime = data[0].rest_time || 10;
@@ -78,7 +61,7 @@ module.exports = {
         return;
       }
 
-      data = await seq.query(
+      data = await sequelize.query(
         `call check_blocked(${from},${to},${budget_id},${employee_id});`
       );
       if (data.length) {
@@ -92,7 +75,7 @@ module.exports = {
         res.json({ warnings });
         return;
       }
-      data = await seq.query(
+      data = await sequelize.query(
         `call verify_worked_days(${budget_id},${employee_id});`
       );
       if (data.length === 5) {
@@ -104,7 +87,7 @@ module.exports = {
         return;
       }
 
-      data = await seq.query(
+      data = await sequelize.query(
         `call sum_worked_hours(${budget_id},${employee_id});`
       );
       if (data.length && data[0].total > 7) {
@@ -118,7 +101,7 @@ module.exports = {
         return;
       }
 
-      data = await seq.query(
+      data = await sequelize.query(
         `call sum_worked_hours_month(${budget_id},${employee_id});`
       );
       console.log(data)
@@ -422,7 +405,7 @@ module.exports = {
           })
           .then(result => {
             const query = `call update_total_hours(${req.body.budget_id})`;
-            seq.query(query);
+            sequelize.query(query);
             res.json(result);
           })
       )
@@ -438,7 +421,7 @@ module.exports = {
         const budget_id = schedule.budget_id;
         schedule.destroy().then(() => {
           const query = `call update_total_hours(${budget_id})`;
-          seq.query(query);
+          sequelize.query(query);
           res.json({ status: true });
         });
       })
@@ -446,7 +429,7 @@ module.exports = {
   },
   findTimeoff(req, res) {
     const query = `call get_presence(${req.params.budget_id})`;
-    seq.query(query).then(timeoff => {
+    sequelize.query(query).then(timeoff => {
       if (timeoff) {
         res.json(timeoff);
       } else {
@@ -458,13 +441,13 @@ module.exports = {
   async getConsumedBySectorReport(req, res) {
     const query = require("./../utils/query.json").consumedBySectorReport;
 
-    const all = await seq.query(
+    const all = await sequelize.query(
       query.all
         .replace("{{dateFrom}}", req.params.date_from)
         .replace("{{dateTo}}", req.params.date_to)
     );
 
-    const sector = await seq.query(
+    const sector = await sequelize.query(
       query.sector
         .replace("{{dateFrom}}", req.params.date_from)
         .replace("{{dateTo}}", req.params.date_to)
@@ -476,11 +459,11 @@ module.exports = {
   async getBudgetVsConsumed(req, res) {
     const query = require("./../utils/query.json").budgetVsConsumed;
 
-    const budgetMonthly = await seq.query(query.budgetMonthly);
-    const actualMonthly = await seq.query(query.actualMonthly);
+    const budgetMonthly = await sequelize.query(query.budgetMonthly);
+    const actualMonthly = await sequelize.query(query.actualMonthly);
 
-    const budgetDaily = await seq.query(query.budgetDaily);
-    const actualDaily = await seq.query(query.actualDaily);
+    const budgetDaily = await sequelize.query(query.budgetDaily);
+    const actualDaily = await sequelize.query(query.actualDaily);
 
     res.json({
       monthly: { actual: actualMonthly[0], budget: budgetMonthly[0] },
