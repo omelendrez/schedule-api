@@ -18,11 +18,6 @@ app.use(logger("dev"));
 models.sequelize.sync({
   force: false
 });
-/*
-models.availability.sequelize.sync({
-  force: true
-});
-*/
 
 app.use(function(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
