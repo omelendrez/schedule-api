@@ -441,17 +441,21 @@ module.exports = {
   async getConsumedBySectorReport(req, res) {
     const query = require("./../utils/query.json").consumedBySectorReport;
 
-    const all = await sequelize.query(
-      query.all
-        .replace("{{dateFrom}}", req.params.date_from)
-        .replace("{{dateTo}}", req.params.date_to)
-    );
+    try {
+      const all = await sequelize.query(
+        query.all
+          .replace("{{dateFrom}}", req.params.date_from)
+          .replace("{{dateTo}}", req.params.date_to)
+      );
 
-    const sector = await sequelize.query(
-      query.sector
-        .replace("{{dateFrom}}", req.params.date_from)
-        .replace("{{dateTo}}", req.params.date_to)
-    );
+      const sector = await sequelize.query(
+        query.sector
+          .replace("{{dateFrom}}", req.params.date_from)
+          .replace("{{dateTo}}", req.params.date_to)
+      );
+    } catch (error) {
+      console.log(error)
+    }
 
     res.json({ sector: sector[0], all: all[0] });
   },
