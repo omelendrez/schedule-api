@@ -127,7 +127,7 @@ module.exports = {
         }
       }
     } catch (error) {
-      console.log(error)
+      res.json({ error })
     }
 
     Schedule.findOrCreate({
