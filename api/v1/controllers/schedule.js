@@ -6,12 +6,19 @@ const env = process.env.NODE_ENV || "development";
 const config = require(path.join(__dirname, "..", "config", "config.json"))[
   env
 ];
-const seq = new sequelize(
-  config.database,
-  config.username,
-  config.password,
-  config
-);
+let seq
+if (config.use_env_variable) {
+  seq = new Sequelize(process.env[config.use_env_variable], config)
+} else {
+  seq = new Sequelize(config.database, config.username, config.password, config)
+}
+
+// const seq = new sequelize(
+//   config.database,
+//   config.username,
+//   config.password,
+//   config
+// );
 const errorMessage = [
   {
     key: "lowRestingTime",
