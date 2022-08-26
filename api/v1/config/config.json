@@ -5,11 +5,25 @@
     "database": "turnera",
     "host": "localhost",
     "dialect": "mysql",
-    "logging": false
+    "logging": false,
+    "define": {
+      "charset": "utf8",
+      "collate": "utf8_general_ci",
+      "freezeTableName": true,
+      "underscored": true
+    },
+    "timezone": "-03:00"
   },
   "production": {
     "use_env_variable": "CLEARDB_DATABASE_URL",
     "dialect": "mysql",
-    "logging": false
+    "logging": false,
+    "define": {
+      "charset": "utf8",
+      "collate": "utf8_general_ci",
+      "freezeTableName": true,
+      "underscored": true
+    },
+    "timezone": "-03:00"
   }
 }
