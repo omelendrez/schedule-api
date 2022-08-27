@@ -45,8 +45,6 @@ module.exports = function (sequelize, DataTypes) {
   User.prototype.toWeb = function (pw) {
     const json = this.toJSON()
     const removeFields = {
-      user_name: undefined,
-      full_name: undefined,
       password: undefined,
       created_at: undefined,
       updated_at: undefined
