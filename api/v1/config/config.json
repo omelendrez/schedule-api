@@ -10,7 +10,9 @@
       "charset": "utf8",
       "collate": "utf8_general_ci",
       "freezeTableName": true,
-      "underscored": true
+      "underscored": true,
+      "createdAt": "created_at",
+      "updatedAt": "updated_at"
     },
     "timezone": "-03:00"
   },
@@ -22,7 +24,9 @@
       "charset": "utf8",
       "collate": "utf8_general_ci",
       "freezeTableName": true,
-      "underscored": true
+      "underscored": true,
+      "createdAt": "created_at",
+      "updatedAt": "updated_at"
     },
     "timezone": "-03:00"
   }
