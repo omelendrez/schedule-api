@@ -3,9 +3,10 @@ const Employee = require("../models").employee;
 const EmployeePosition = require("../models").employee_position;
 const Availability = require("../models").availability;
 const sequelize = require("sequelize");
+const Op = sequelize.Op
 
 module.exports = {
-  create (req, res) {
+  create(req, res) {
     const badge = req.body.badge.toUpperCase();
     const last_name =
       req.body.last_name.charAt(0).toUpperCase() + req.body.last_name.slice(1);
@@ -53,7 +54,7 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  findAll (req, res) {
+  findAll(req, res) {
     const Status = require("../models").status;
     const Branch = require("../models").branch;
 
@@ -63,7 +64,14 @@ module.exports = {
     const page = parseInt(req.query.page ? req.query.page : 0);
     const size = parseInt(req.query.size ? req.query.size : 1000);
 
+    const { profile_id, branch_id } = req.decoded.data
+
     return Employee.findAndCountAll({
+      where: profile_id !== 1 ? {
+        [Op.or]: [
+          { branch_id: branch_id }
+        ]
+      } : undefined,
       raw: true,
       order: ["last_name", "first_name"],
       offset: size !== 1000 ? (page - 1) * size : 0,
@@ -130,7 +138,7 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  findById (req, res) {
+  findById(req, res) {
     const Status = require("../models").status;
     const Branch = require("../models").branch;
     const Availability = require("../models").availability;
@@ -188,7 +196,7 @@ module.exports = {
       )
       .catch(error => res.status(400).send(error));
   },
-  findByBranchId (req, res) {
+  findByBranchId(req, res) {
     return Employee.findAndCountAll({
       raw: true,
       where: {
@@ -209,7 +217,7 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  delete (req, res) {
+  delete(req, res) {
     const Schedules = require('../models').schedule
     Schedules
       .findOne({
@@ -242,7 +250,7 @@ module.exports = {
       })
       .catch(error => res.status(400).send(error))
   },
-  update (req, res) {
+  update(req, res) {
     const badge = req.body.badge.toUpperCase();
     const last_name =
       req.body.last_name.charAt(0).toUpperCase() + req.body.last_name.slice(1);
