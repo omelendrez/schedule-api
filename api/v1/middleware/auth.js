@@ -9,7 +9,6 @@ module.exports = {
       try {
         result = jwt.verify(token, process.env.JWT_SECRET, { expiresIn: '1d' });
         req.decoded = result
-        console.log(result)
         next();
       } catch (err) {
         return res.status(401).send(err);

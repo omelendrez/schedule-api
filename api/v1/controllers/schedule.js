@@ -114,7 +114,7 @@ module.exports = {
         data = await seq.query(
           `call sum_worked_hours_month(${budget_id},${employee_id});`
         )
-        console.log(data)
+
         if (data.length && data[0].total > 160) {
           warnings = {
             warning: true,
@@ -259,13 +259,13 @@ module.exports = {
             .then((schedule) =>
               schedule
                 ? res.json({
-                    schedule: schedule,
-                    budget: { rows: budget, count: 1 }
-                  })
+                  schedule: schedule,
+                  budget: { rows: budget, count: 1 }
+                })
                 : res.json({
-                    budget: { rows: budget, count: 1 },
-                    schedule: { count: 0, rows: [] }
-                  })
+                  budget: { rows: budget, count: 1 },
+                  schedule: { count: 0, rows: [] }
+                })
             )
             .catch((error) => res.status(400).send(error))
         } else {
@@ -384,13 +384,13 @@ module.exports = {
             .then((schedule) =>
               schedule
                 ? res.json({
-                    schedule: schedule,
-                    budget: { rows: budget, count: 1 }
-                  })
+                  schedule: schedule,
+                  budget: { rows: budget, count: 1 }
+                })
                 : res.json({
-                    budget: { rows: budget, count: 1 },
-                    schedule: { count: 0, rows: [] }
-                  })
+                  budget: { rows: budget, count: 1 },
+                  schedule: { count: 0, rows: [] }
+                })
             )
             .catch((error) => res.status(400).send(error))
         } else {
