@@ -1,6 +1,7 @@
 "use strict";
 const User = require("../models").user;
 const sequelize = require("sequelize");
+const jwt = require('jsonwebtoken')
 const Op = sequelize.Op
 
 const errorMessage = [
@@ -153,9 +154,18 @@ module.exports = {
           status_id: 1
         }
       })
-      .then(user => user ? res.json(user) : res.json({
-        "id": 0
-      }))
+      .then((user) => {
+        if (user) {
+          const token = jwt.sign({
+            data: user.toWeb()
+          }, process.env.JWT_SECRET, { expiresIn: '1h' }, { algorithm: 'RS256' });
+          res.json({ ...user.toWeb(), token })
+        } else {
+          res.json({
+            "id": 0
+          })
+        }
+      })
       .catch(error => res.status(400).send(error));
   },
 
@@ -238,5 +248,4 @@ module.exports = {
         msg: "Password actual no es correcta"
       }));
   }
-
 };

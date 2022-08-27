@@ -1,9 +1,6 @@
 {
   "development": {
-    "username": "turnera_user",
-    "password": "M1a4$1t4E8r0",
-    "database": "turnera",
-    "host": "localhost",
+    "use_env_variable": "DATABASE_URL",
     "dialect": "mysql",
     "logging": false,
     "define": {
@@ -17,7 +14,7 @@
     "timezone": "-03:00"
   },
   "production": {
-    "use_env_variable": "CLEARDB_DATABASE_URL",
+    "use_env_variable": "DATABASE_URL",
     "dialect": "mysql",
     "logging": false,
     "define": {

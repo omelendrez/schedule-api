@@ -2,9 +2,12 @@
 const absenteeism = require("../controllers/absenteeism");
 const express = require("express");
 const router = express.Router();
+const auth = require('../middleware/auth')
 
-router.get("/", absenteeism.findAll);
-router.post("/", absenteeism.create);
-router.delete("/:id", absenteeism.delete);
-router.put("/:id", absenteeism.update);
+const secure = auth.validateToken
+
+router.get("/", secure, absenteeism.findAll);
+router.post("/", secure, absenteeism.create);
+router.delete("/:id", secure, absenteeism.delete);
+router.put("/:id", secure, absenteeism.update);
 module.exports = router;

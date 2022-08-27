@@ -1,35 +1,24 @@
 "use strict";
 const express = require("express");
-const bodyParser = require("body-parser");
+const cors = require('cors')
 const logger = require("morgan");
 const apiPath = "./api/v1";
 const models = require(apiPath + "/models");
-
 const app = express();
 
-app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    extended: true
-  })
-);
+app.use(express.json());
 app.use(logger("dev"));
+app.use(cors())
 
 models.sequelize.sync({
   force: false
 });
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
-  res.setHeader("Access-Control-Allow-Credentials", true);
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
+  // res.setHeader("Access-Control-Allow-Credentials", true);
   next();
 });
 
@@ -49,10 +38,37 @@ app.use("/user", require(apiPath + "/routes/user"));
 
 app.use("/login", require(apiPath + "/routes/login"));
 
+app.use('/', function (req, res) {
+  res.statusCode = 422
+  res.json({ success: false, error: 'Endpoint not found', data: {} })
+})
+
+app.use(function (req, res, next) {
+  var err = new Error('Not Found')
+  err.status = 404
+  next(err)
+})
+
+app.use(function (err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message
+  res.locals.error = req.app.get('env') === 'development' ? err : {}
+
+  // render the error page
+  res.status(err.status || 500)
+  res.render('error')
+})
+
+module.exports = app
+
 const port = process.env.PORT || 3010;
 
 app.set("port", port);
 
-app.listen(app.get("port"), function() {
+app.listen(app.get("port"), function () {
   console.log("Node app is running on port", app.get("port"));
 });
+
+process.on('unhandledRejection', error => {
+  console.error('Uncaught Error', console.error(error))
+})

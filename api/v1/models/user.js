@@ -1,5 +1,5 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const User = sequelize.define(
     "user",
     {
@@ -42,5 +42,18 @@ module.exports = function(sequelize, DataTypes) {
     }
   );
 
+  User.prototype.toWeb = function (pw) {
+    const json = this.toJSON()
+    const removeFields = {
+      user_name: undefined,
+      full_name: undefined,
+      password: undefined,
+      created_at: undefined,
+      updated_at: undefined
+    }
+    return { ...json, ...removeFields }
+  }
+
   return User;
 };
+

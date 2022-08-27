@@ -2,12 +2,15 @@
 const position = require("../controllers/position");
 const express = require("express");
 const router = express.Router();
+const auth = require('../middleware/auth')
 
-router.get("/", position.findAll);
-router.get("/:id/sector", position.findBySectorId);
-router.get("/sector", position.findAllWithSectors)
-router.post("/", position.create);
-router.put("/:id", position.update);
-router.delete("/:id", position.delete);
+const secure = auth.validateToken
+
+router.get("/", secure, position.findAll);
+router.get("/:id/sector", secure, position.findBySectorId);
+router.get("/sector", secure, position.findAllWithSectors)
+router.post("/", secure, position.create);
+router.put("/:id", secure, position.update);
+router.delete("/:id", secure, position.delete);
 
 module.exports = router;

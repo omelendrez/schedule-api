@@ -1,13 +1,16 @@
-"use strict";
-const employee = require("../controllers/employee");
-const express = require("express");
-const router = express.Router();
+'use strict'
+const employee = require('../controllers/employee')
+const express = require('express')
+const router = express.Router()
+const auth = require('../middleware/auth')
 
-router.get("/:id", employee.findById);
-router.get("/:id/branch", employee.findByBranchId);
-router.get("/", employee.findAll);
-router.post("/", employee.create);
-router.put("/:id", employee.update);
-router.delete("/:id", employee.delete);
+const secure = auth.validateToken
 
-module.exports = router;
+router.get('/:id', secure, employee.findById)
+router.get('/:id/branch', secure, employee.findByBranchId)
+router.get('/', secure, employee.findAll)
+router.post('/', secure, employee.create)
+router.put('/:id', secure, employee.update)
+router.delete('/:id', secure, employee.delete)
+
+module.exports = router
