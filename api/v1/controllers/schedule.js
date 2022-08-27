@@ -462,6 +462,7 @@ module.exports = {
       query.all
         .replace('{{dateFrom}}', req.params.date_from)
         .replace('{{dateTo}}', req.params.date_to)
+        .replace('{{branchId}}', req.params.branch_id)
     )
 
     const sector = await seq.query(

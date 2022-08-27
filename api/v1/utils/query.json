@@ -1,6 +1,6 @@
 {
   "consumedBySectorReport": {
-    "all": "select se.name as sector, p.name as position, sum(total) as total from schedule as s inner join budget as b on s.budget_id = b.id inner join position as p on s.position_id = p.id inner join sector as se on p.sector_id = se.id where b.date between '{{dateFrom}}' and '{{dateTo}}' group by se.name, p.name;",
+    "all": "select se.name as sector, p.name as position, sum(total) as total from schedule as s inner join budget as b on s.budget_id = b.id inner join position as p on s.position_id = p.id inner join sector as se on p.sector_id = se.id where b.date between '{{dateFrom}}' and '{{dateTo}}' and b.branch_id='{{branchId}}' group by se.name, p.name;",
     "sector": "select se.name as sector, sum(total) as total from schedule as s inner join budget as b on s.budget_id = b.id inner join position as  p on s.position_id = p.id inner join sector as se on p.sector_id = se.id where b.date between '{{dateFrom}}' and  '{{dateTo}}' group by se.name;"
   },
   "budgetVsConsumed": {
