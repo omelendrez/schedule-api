@@ -162,8 +162,8 @@ module.exports = {
           res.json({ ...user.toWeb(), token })
         } else {
           res.status(401).json({
-            message: 'Login falló',
-            detail: 'El usuario o password ingresados son incorrectos'
+            message: 'Credenciales inválidas',
+            detail: 'El usuario o password ingresados son incorrectos. Por favor corrija las credenciales y vuelva a intentar.'
           })
         }
       })
