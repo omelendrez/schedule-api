@@ -38,17 +38,12 @@ app.use("/user", require(apiPath + "/routes/user"));
 app.use("/login", require(apiPath + "/routes/login"));
 
 app.use('/', function (req, res) {
-  res.statusCode = 422
-  res.json({ success: false, error: 'Endpoint not found', data: {} })
-})
-
-app.use(function (req, res, next) {
-  var err = new Error('Not Found')
-  err.status = 404
-  next(err)
+  res.statusCode = 404
+  res.json({ message: 'Error', detail: 'Recurso inexistente' })
 })
 
 app.use(function (err, req, res, next) {
+  console.log(err)
   // set locals, only providing error in development
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}
