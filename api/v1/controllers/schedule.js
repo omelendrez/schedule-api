@@ -469,6 +469,7 @@ module.exports = {
       query.sector
         .replace('{{dateFrom}}', req.params.date_from)
         .replace('{{dateTo}}', req.params.date_to)
+        .replace('{{branchId}}', req.params.branch_id)
     )
 
     res.json({ sector: sector[0], all: all[0] })
