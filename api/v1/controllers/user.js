@@ -145,7 +145,6 @@ module.exports = {
   },
 
   login(req, res) {
-
     return User
       .findOne({
         where: {
@@ -158,7 +157,7 @@ module.exports = {
         if (user) {
           const token = jwt.sign({
             data: user.toWeb()
-          }, process.env.JWT_SECRET, { expiresIn: '1h' }, { algorithm: 'RS256' });
+          }, process.env.JWT_SECRET, { expiresIn: '1d' }, { algorithm: 'RS256' });
           res.json({ ...user.toWeb(), token })
         } else {
           res.status(401).json({
