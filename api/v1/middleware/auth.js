@@ -11,14 +11,19 @@ module.exports = {
         req.decoded = result
         next();
       } catch (err) {
-        return res.status(401).send(err);
+        return res.status(401).send({
+          code: 401,
+          message: 'Token expirada',
+          detail: 'La token usada para acceder a la base de datos ha expirado. Por favor a loguearse.'
+        });
       }
     } else {
       result = {
-        error: `Authentication error. Token required.`,
-        status: 401
-      };
-      return res.status(401).send(result);
-    }
+        code: 401,
+        message: 'Token requerida',
+        detail: 'Una token es requerida para acceder a este recurso.'
+      }
+    };
+    return res.status(401).send(result);
   }
 };
