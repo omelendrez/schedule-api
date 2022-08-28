@@ -161,7 +161,7 @@ module.exports = {
           }, process.env.JWT_SECRET, { expiresIn: '1h' }, { algorithm: 'RS256' });
           res.json({ ...user.toWeb(), token })
         } else {
-          res.status(400).json({
+          res.status(401).json({
             message: 'Login falló',
             detail: 'El usuario o password ingresados son incorrectos'
           })
