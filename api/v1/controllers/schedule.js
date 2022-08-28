@@ -33,7 +33,7 @@ const errorMessage = [
   },
   {
     key: 'exceededMonthlyHours',
-    value: '{name} ya ha trabado {hours} horas estel mes'
+    value: '{name} ya ha trabado {hours} horas este mes'
   }
 ]
 const findMessage = (key) => {
