@@ -229,9 +229,7 @@ module.exports = {
         break
       case '1':
         order = [
-          ['date', 'ASC'],
-          [Employee, 'last_name', 'ASC'],
-          [Employee, 'first_name', 'ASC']
+          ['id', 'ASC']
         ]
         break
     }
