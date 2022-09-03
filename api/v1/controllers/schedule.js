@@ -45,13 +45,13 @@ const findMessage = (key) => {
 
 module.exports = {
   async create(req, res) {
+    const budget_id = req.body.budget_id
+    const employee_id = req.body.employee_id
+    const from = parseInt(req.body.from)
+    const forced = req.body.forced
+    let to = parseInt(req.body.to)
     try {
       let warnings, data
-      const budget_id = req.body.budget_id
-      const employee_id = req.body.employee_id
-      const from = parseInt(req.body.from)
-      const forced = req.body.forced
-      let to = parseInt(req.body.to)
       to = to < from ? to + 24 : to
       if (!forced) {
         data = await seq.query(
@@ -127,28 +127,42 @@ module.exports = {
         }
       }
     } catch (error) {
-      res.json({ error })
+      res.status(500).json({
+        message: 'Error interno',
+        detail: 'Se ha producido un error interno en el servidor.',
+        data: error
+      })
     }
 
-    Schedule.findOrCreate({
-      where: {
-        budget_id: budget_id,
-        employee_id: employee_id,
-        position_id: req.body.position_id,
-        from: from,
-        to: to
-      }
-    })
-      .then((schedule) => {
-        let warnings = null
-        seq
-          .query(`call update_total_hours(${budget_id})`)
-          .then(() => {
-            res.status(201).json({ schedule, warnings })
-          })
-          .catch((error) => res.status(400).send(error))
+    try {
+
+      Schedule.findOrCreate({
+        where: {
+          budget_id: budget_id,
+          employee_id: employee_id,
+          position_id: req.body.position_id,
+          from: from,
+          to: to
+        }
       })
-      .catch((error) => res.status(400).send(error))
+        .then((schedule) => {
+          let warnings = null
+          seq
+            .query(`call update_total_hours(${budget_id})`)
+            .then(() => {
+              res.status(201).json({ schedule, warnings })
+            })
+            .catch((error) => res.status(400).send(error))
+        })
+        .catch((error) => res.status(400).send(error))
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error interno',
+        detail: 'Se ha producido un error interno en el servidor.',
+        data: error
+      })
+    }
+
   },
   findByBudget(req, res) {
     const Budget = require('../models').budget
