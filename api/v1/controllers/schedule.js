@@ -50,118 +50,102 @@ module.exports = {
     const from = parseInt(req.body.from)
     const forced = req.body.forced
     let to = parseInt(req.body.to)
-    try {
-      let warnings, data
-      to = to < from ? to + 24 : to
-      if (!forced) {
-        data = await seq.query(
-          `call ensure_rest_time(${budget_id},${employee_id},${from});`
-        )
-        const restTime = data[0].rest_time || 10
-        const weekDay = data[0].week_day < 4 ? 9 : 10
-        if (restTime < weekDay) {
-          warnings = {
-            warning: true,
-            message: findMessage('lowRestingTime').replace(
-              '{hours}',
-              data[0].rest_time
-            )
-          }
-          res.json({ warnings })
-          return
+    let warnings, data
+    to = to < from ? to + 24 : to
+    if (!forced) {
+      data = await seq.query(
+        `call ensure_rest_time(${budget_id},${employee_id},${from});`
+      )
+      const restTime = data[0].rest_time || 10
+      const weekDay = data[0].week_day < 4 ? 9 : 10
+      if (restTime < weekDay) {
+        warnings = {
+          warning: true,
+          message: findMessage('lowRestingTime').replace(
+            '{hours}',
+            data[0].rest_time
+          )
         }
-
-        data = await seq.query(
-          `call check_blocked(${from},${to},${budget_id},${employee_id});`
-        )
-        if (data.length) {
-          warnings = {
-            warning: true,
-            message: findMessage('timeFrameBlocked')
-              .replace('{name}', data[0].first_name)
-              .replace('{from}', data[0].from)
-              .replace('{to}', data[0].to)
-          }
-          res.json({ warnings })
-          return
-        }
-        data = await seq.query(
-          `call verify_worked_days(${budget_id},${employee_id});`
-        )
-        if (data.length === 5) {
-          warnings = {
-            warning: true,
-            message: findMessage('mustBeOnTimeoff')
-          }
-          res.json({ warnings })
-          return
-        }
-
-        data = await seq.query(
-          `call sum_worked_hours(${budget_id},${employee_id});`
-        )
-        if (data.length && data[0].total > 7) {
-          warnings = {
-            warning: true,
-            message: findMessage('exceededDailyHours')
-              .replace('{name}', data[0].name)
-              .replace('{hours}', data[0].total)
-          }
-          res.json({ warnings })
-          return
-        }
-
-        data = await seq.query(
-          `call sum_worked_hours_month(${budget_id},${employee_id});`
-        )
-
-        if (data.length && data[0].total > 160) {
-          warnings = {
-            warning: true,
-            message: findMessage('exceededMonthlyHours')
-              .replace('{name}', data[0].name)
-              .replace('{hours}', data[0].total)
-          }
-          res.json({ warnings })
-          return
-        }
+        res.json({ warnings })
+        return
       }
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error interno',
-        detail: 'Se ha producido un error interno en el servidor.',
-        data: error
-      })
-    }
 
-    try {
-
-      Schedule.findOrCreate({
-        where: {
-          budget_id: budget_id,
-          employee_id: employee_id,
-          position_id: req.body.position_id,
-          from: from,
-          to: to
+      data = await seq.query(
+        `call check_blocked(${from},${to},${budget_id},${employee_id});`
+      )
+      if (data.length) {
+        warnings = {
+          warning: true,
+          message: findMessage('timeFrameBlocked')
+            .replace('{name}', data[0].first_name)
+            .replace('{from}', data[0].from)
+            .replace('{to}', data[0].to)
         }
-      })
-        .then((schedule) => {
-          let warnings = null
-          seq
-            .query(`call update_total_hours(${budget_id})`)
-            .then(() => {
-              res.status(201).json({ schedule, warnings })
-            })
-            .catch((error) => res.status(400).send(error))
-        })
-        .catch((error) => res.status(400).send(error))
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error interno',
-        detail: 'Se ha producido un error interno en el servidor.',
-        data: error
-      })
+        res.json({ warnings })
+        return
+      }
+      data = await seq.query(
+        `call verify_worked_days(${budget_id},${employee_id});`
+      )
+      if (data.length === 5) {
+        warnings = {
+          warning: true,
+          message: findMessage('mustBeOnTimeoff')
+        }
+        res.json({ warnings })
+        return
+      }
+
+      data = await seq.query(
+        `call sum_worked_hours(${budget_id},${employee_id});`
+      )
+      if (data.length && data[0].total > 7) {
+        warnings = {
+          warning: true,
+          message: findMessage('exceededDailyHours')
+            .replace('{name}', data[0].name)
+            .replace('{hours}', data[0].total)
+        }
+        res.json({ warnings })
+        return
+      }
+
+      data = await seq.query(
+        `call sum_worked_hours_month(${budget_id},${employee_id});`
+      )
+
+      if (data.length && data[0].total > 160) {
+        warnings = {
+          warning: true,
+          message: findMessage('exceededMonthlyHours')
+            .replace('{name}', data[0].name)
+            .replace('{hours}', data[0].total)
+        }
+        res.json({ warnings })
+        return
+      }
     }
+
+
+    Schedule.findOrCreate({
+      where: {
+        budget_id: budget_id,
+        employee_id: employee_id,
+        position_id: req.body.position_id,
+        from: from,
+        to: to
+      }
+    })
+      .then((schedule) => {
+        let warnings = null
+        seq
+          .query(`call update_total_hours(${budget_id})`)
+          .then(() => {
+            res.status(201).json({ schedule, warnings })
+          })
+          .catch((error) => res.status(400).send(error))
+      })
+      .catch((error) => res.status(400).send(error))
 
   },
   findByBudget(req, res) {
