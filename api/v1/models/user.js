@@ -31,16 +31,9 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         defaultValue: 1
       }
-    },
-    {
-      indexes: [
-        {
-          unique: true,
-          fields: ["user_name"]
-        }
-      ]
-    }
-  );
+    }, {
+    timestamps: false
+  });
 
   User.prototype.toWeb = function (pw) {
     const json = this.toJSON()

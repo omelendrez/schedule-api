@@ -1,5 +1,5 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Availability = sequelize.define(
     "availability",
     {
@@ -19,15 +19,9 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.CHAR(2),
         allowNull: false
       }
-    },
-    {
-      indexes: [
-        {
-          fields: ["employee_id"]
-        }
-      ]
-    }
-  );
+    }, {
+    timestamps: false
+  });
 
   return Availability;
 };

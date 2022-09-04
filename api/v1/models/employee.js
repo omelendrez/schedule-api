@@ -1,5 +1,5 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Employee = sequelize.define("employee", {
     badge: {
       type: DataTypes.STRING,
@@ -25,6 +25,8 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       defaultValue: 1
     }
+  }, {
+    timestamps: false
   });
 
   return Employee;

@@ -1,5 +1,5 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Schedule = sequelize.define(
     "schedule",
     {
@@ -27,7 +27,9 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         defaultValue: 0
       }
-    },
+    }, {
+    timestamps: false
+  },
     {
       indexes: [
         {

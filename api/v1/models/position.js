@@ -1,5 +1,5 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Position = sequelize.define(
     "position",
     {
@@ -19,15 +19,9 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.STRING,
         allowNull: false
       }
-    },
-    {
-      indexes: [
-        {
-          fields: ["sector_id"]
-        }
-      ]
-    }
-  );
+    }, {
+    timestamps: false
+  });
 
   return Position;
 };

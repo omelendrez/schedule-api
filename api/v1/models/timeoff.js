@@ -1,5 +1,5 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Timeoff = sequelize.define(
     "timeoff",
     {
@@ -15,7 +15,9 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.DATEONLY,
         allowNull: false
       }
-    },
+    }, {
+    timestamps: false
+  },
     {
       indexes: [
         {

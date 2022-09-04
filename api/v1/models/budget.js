@@ -1,5 +1,5 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Budget = sequelize.define(
     "budget",
     {
@@ -23,7 +23,9 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.STRING,
         allowNull: false
       }
-    },
+    }, {
+    timestamps: false
+  },
     {
       indexes: [
         {

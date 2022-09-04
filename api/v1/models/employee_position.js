@@ -1,5 +1,5 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Branch = sequelize.define(
     "employee_position",
     {
@@ -11,7 +11,9 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         allowNull: false
       }
-    },
+    }, {
+    timestamps: false
+  },
     {
       indexes: [
         {
