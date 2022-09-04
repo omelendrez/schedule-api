@@ -33,23 +33,7 @@ module.exports = {
       attributes: [
         'id',
         'name',
-        'status_id',
-        [
-          sequelize.fn(
-            'date_format',
-            sequelize.col('absenteeism.created_at'),
-            '%d-%b-%y'
-          ),
-          'created_at'
-        ],
-        [
-          sequelize.fn(
-            'date_format',
-            sequelize.col('absenteeism.updated_at'),
-            '%d-%b-%y'
-          ),
-          'updated_at'
-        ]
+        'status_id'
       ]
     })
       .then((absenteeism) => res.json(absenteeism))

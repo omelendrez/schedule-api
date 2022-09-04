@@ -96,9 +96,7 @@ module.exports = {
           'full_name',
           'status_id',
           'profile_id',
-          'branch_id',
-          [sequelize.fn('date_format', sequelize.col('user.created_at'), '%d-%b-%y'), 'created_at'],
-          [sequelize.fn('date_format', sequelize.col('user.updated_at'), '%d-%b-%y'), 'updated_at']
+          'branch_id'
         ]
       })
       .then(users => res.json(users))

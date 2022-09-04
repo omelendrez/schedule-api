@@ -115,22 +115,6 @@ module.exports = {
             "%d-%b-%y"
           ),
           "_joining_date"
-        ],
-        [
-          sequelize.fn(
-            "date_format",
-            sequelize.col("employee.created_at"),
-            "%d-%b-%y"
-          ),
-          "created_at"
-        ],
-        [
-          sequelize.fn(
-            "date_format",
-            sequelize.col("employee.updated_at"),
-            "%d-%b-%y"
-          ),
-          "updated_at"
         ]
       ]
     })

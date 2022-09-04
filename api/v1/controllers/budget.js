@@ -58,9 +58,7 @@ module.exports = {
           'hours',
           "program",
           'footer',
-          [sequelize.fn('weekday', sequelize.col('date')), 'weekday'],
-          [sequelize.fn('date_format', sequelize.col('budget.created_at'), '%d-%b-%y'), 'created_at'],
-          [sequelize.fn('date_format', sequelize.col('budget.updated_at'), '%d-%b-%y'), 'updated_at']
+          [sequelize.fn('weekday', sequelize.col('date')), 'weekday']
         ],
         include: [{
           model: Branch,

@@ -35,9 +35,7 @@ module.exports = {
         attributes: [
           'id',
           'name',
-          'status_id',
-          [sequelize.fn('date_format', sequelize.col('branch.created_at'), '%d-%b-%y'), 'created_at'],
-          [sequelize.fn('date_format', sequelize.col('branch.updated_at'), '%d-%b-%y'), 'updated_at']
+          'status_id'
         ]
       })
       .then(branch => res.json(branch))

@@ -39,9 +39,7 @@ module.exports = {
           'name',
           'sector_id',
           'color',
-          'text',
-          [sequelize.fn('date_format', sequelize.col('position.created_at'), '%d-%b-%y'), 'created_at'],
-          [sequelize.fn('date_format', sequelize.col('position.updated_at'), '%d-%b-%y'), 'updated_at']
+          'text'
         ],
         include: [{
           model: Sector,

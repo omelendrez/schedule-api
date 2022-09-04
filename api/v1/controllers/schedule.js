@@ -209,23 +209,7 @@ module.exports = {
               'from',
               'to',
               'employee_id',
-              'position_id',
-              [
-                sequelize.fn(
-                  'date_format',
-                  sequelize.col('schedule.created_at'),
-                  '%d-%b-%y'
-                ),
-                'created_at'
-              ],
-              [
-                sequelize.fn(
-                  'date_format',
-                  sequelize.col('schedule.updated_at'),
-                  '%d-%b-%y'
-                ),
-                'updated_at'
-              ]
+              'position_id'
             ],
             include: [
               {
