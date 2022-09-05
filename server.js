@@ -14,18 +14,30 @@ models.sequelize.sync({
   alter: true
 });
 
+// SELECT
+//   TABLE_NAME AS `Table`,
+//   ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024, 2) AS `Size (MB)`,
+//   TABLE_ROWS
+// FROM
+//   information_schema.TABLES
+// WHERE
+//   TABLE_SCHEMA = "railway"
+// ORDER BY
+//   (DATA_LENGTH + INDEX_LENGTH)
+// DESC;
+
 // 05/09/2022
 // # Table, Size (MB), TABLE_ROWS
-// 'schedule', '6.03', '64698'
-// 'timeoff', '0.25', '3029'
-// 'budget', '0.06', '416'
-// 'availability', '0.03', '167'
-// 'employee_position', '0.03', '390'
+// 'schedule', '4.03', '57220'
+// 'timeoff', '0.22', '2805'
+// 'budget', '0.06', '391'
+// 'employee_position', '0.06', '384'
+// 'availability', '0.03', '150'
 // 'position', '0.03', '11'
 // 'user', '0.03', '9'
 // 'absenteeism', '0.02', '7'
 // 'branch', '0.02', '2'
-// 'employee', '0.02', '96'
+// 'employee', '0.02', '92'
 // 'profile', '0.02', '2'
 // 'sector', '0.02', '7'
 // 'status', '0.02', '2'
