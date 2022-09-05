@@ -26,36 +26,19 @@ models.sequelize.sync({
 //   (DATA_LENGTH + INDEX_LENGTH)
 // DESC;
 
-// 05/09/2022
 // # Table, Size (MB), TABLE_ROWS
-// 'schedule', '4.03', '57220'
-// 'timeoff', '0.22', '2805'
-// 'budget', '0.06', '391'
-// 'employee_position', '0.06', '384'
-// 'availability', '0.03', '150'
-// 'position', '0.03', '11'
-// 'user', '0.03', '9'
-// 'absenteeism', '0.02', '7'
+// 'schedule', '14.03', '208875'
+// 'timeoff', '1.91', '12208'
+// 'budget', '0.14', '1335'
+// 'employee_position', '0.08', '643'
+// 'availability', '0.03', '236'
+// 'position', '0.03', '13'
+// 'user', '0.03', '0'
+// 'absenteeism', '0.02', '9'
 // 'branch', '0.02', '2'
-// 'employee', '0.02', '92'
+// 'employee', '0.02', '193'
 // 'profile', '0.02', '2'
-// 'sector', '0.02', '7'
-// 'status', '0.02', '2'
-
-// 04/09/2022
-// # Table, Size in MB, TABLE_ROWS
-// 'schedule', '4.03', '58500'
-// 'timeoff', '0.22', '2805'
-// 'budget', '0.06', '391'
-// 'employee_position', '0.06', '384'
-// 'availability', '0.03', '150'
-// 'position', '0.03', '11'
-// 'user', '0.03', '9'
-// 'absenteeism', '0.02', '7'
-// 'branch', '0.02', '2'
-// 'employee', '0.02', '92'
-// 'profile', '0.02', '2'
-// 'sector', '0.02', '7'
+// 'sector', '0.02', '8'
 // 'status', '0.02', '2'
 
 app.use(function (req, res, next) {
