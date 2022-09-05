@@ -4,11 +4,11 @@ module.exports = function (sequelize, DataTypes) {
     "timeoff",
     {
       employee_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.SMALLINT,
         allowNull: false
       },
       absenteeism_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       date: {

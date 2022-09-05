@@ -14,6 +14,22 @@ models.sequelize.sync({
   alter: true
 });
 
+// 05/09/2022
+// # Table, Size (MB), TABLE_ROWS
+// 'schedule', '6.03', '64698'
+// 'timeoff', '0.25', '3029'
+// 'budget', '0.06', '416'
+// 'availability', '0.03', '167'
+// 'employee_position', '0.03', '390'
+// 'position', '0.03', '11'
+// 'user', '0.03', '9'
+// 'absenteeism', '0.02', '7'
+// 'branch', '0.02', '2'
+// 'employee', '0.02', '96'
+// 'profile', '0.02', '2'
+// 'sector', '0.02', '7'
+// 'status', '0.02', '2'
+
 // 04/09/2022
 // # Table, Size in MB, TABLE_ROWS
 // 'schedule', '4.03', '58500'

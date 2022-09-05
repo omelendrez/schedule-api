@@ -4,11 +4,11 @@ module.exports = function (sequelize, DataTypes) {
     "employee_position",
     {
       employee_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.SMALLINT,
         allowNull: false
       },
       position_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       }
     }, {

@@ -2,11 +2,11 @@
 module.exports = function (sequelize, DataTypes) {
   const Branch = sequelize.define("branch", {
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20),
       allowNull: false
     },
     status_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.TINYINT,
       defaultValue: 1
     }
   }, {

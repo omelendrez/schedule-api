@@ -4,27 +4,27 @@ module.exports = function (sequelize, DataTypes) {
     "schedule",
     {
       budget_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.SMALLINT,
         allowNull: false
       },
       employee_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.SMALLINT,
         allowNull: false
       },
       position_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       from: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       to: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       total: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         defaultValue: 0
       }
     }, {

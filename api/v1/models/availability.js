@@ -4,11 +4,11 @@ module.exports = function (sequelize, DataTypes) {
     "availability",
     {
       employee_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.SMALLINT,
         allowNull: false
       },
       week_day: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       from: {

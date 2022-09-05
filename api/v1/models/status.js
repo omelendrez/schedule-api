@@ -2,7 +2,7 @@
 module.exports = function (sequelize, DataTypes) {
   const Status = sequelize.define("status", {
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20),
       allowNull: false
     }
   }, {

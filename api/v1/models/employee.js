@@ -2,19 +2,19 @@
 module.exports = function (sequelize, DataTypes) {
   const Employee = sequelize.define("employee", {
     badge: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(15),
       allowNull: false
     },
     last_name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20),
       allowNull: false
     },
     first_name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20),
       allowNull: false
     },
     branch_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.TINYINT,
       allowNull: false
     },
     joining_date: {
@@ -22,7 +22,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false
     },
     status_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.TINYINT,
       defaultValue: 1
     }
   }, {

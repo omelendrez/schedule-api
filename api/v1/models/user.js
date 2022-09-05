@@ -12,23 +12,23 @@ module.exports = function (sequelize, DataTypes) {
         }
       },
       password: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(20),
         defaultValue: "123"
       },
       full_name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
         allowNull: false
       },
       profile_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       branch_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       status_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         defaultValue: 1
       }
     }, {

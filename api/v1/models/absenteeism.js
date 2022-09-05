@@ -2,11 +2,11 @@
 module.exports = function (sequelize, DataTypes) {
   const Absenteeism = sequelize.define("absenteeism", {
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20),
       allowNull: false
     },
     status_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.TINYINT,
       defaultValue: 1
     }
   }, {

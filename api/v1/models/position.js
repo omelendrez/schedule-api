@@ -4,19 +4,19 @@ module.exports = function (sequelize, DataTypes) {
     "position",
     {
       sector_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(20),
         allowNull: false
       },
       color: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(7),
         allowNull: false
       },
       text: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(7),
         allowNull: false
       }
     }, {

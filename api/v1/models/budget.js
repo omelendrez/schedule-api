@@ -4,7 +4,7 @@ module.exports = function (sequelize, DataTypes) {
     "budget",
     {
       branch_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       date: {
@@ -12,11 +12,11 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: false
       },
       hours: {
-        type: DataTypes.INTEGER,
-        allowNull: false
+        type: DataTypes.SMALLINT,
+        defaultValue: 0
       },
       program: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.SMALLINT,
         defaultValue: 0
       },
       footer: {
