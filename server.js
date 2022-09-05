@@ -41,6 +41,7 @@ models.sequelize.sync({
 // 'sector', '0.02', '8'
 // 'status', '0.02', '2'
 
+
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
