@@ -110,7 +110,7 @@ module.exports = {
           attributes: ["name"]
         }
       ],
-      order: [["date", "DESC"]],
+      order: [["_date", "DESC"]],
       attributes: [
         "id",
         "employee_id",
