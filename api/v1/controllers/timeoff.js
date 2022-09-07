@@ -152,12 +152,14 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
+  // Empleados de franto para el día determinado
   findAllTimeTimeoffs(req, res) {
     return Timeoff.findAndCountAll({
       where: {
-        absenteeism_id: 1
+        absenteeism_id: 1,
+        date: req.query.date
       },
-      order: [['employee_id', 'ASC'], ["date", "DESC"]],
+      order: [['employee_id', 'ASC']],
       attributes: ['employee_id', [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%d-%b-%Y"), "date"]]
     })
       .then(
