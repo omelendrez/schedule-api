@@ -8,9 +8,11 @@ const app = express();
 
 app.use(express.json());
 app.use(logger("dev"));
+// app.use(logger("tiny", { skip: () => process.env.NODE_ENV === 'production' }));
 app.use(cors())
 
 models.sequelize.sync({
+  force: false,
   alter: false
 });
 
