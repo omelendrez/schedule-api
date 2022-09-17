@@ -1,14 +1,9 @@
 "use strict";
-const Timeoff = require("../models").timeoff;
-const sequelize = require("sequelize");
+const Timeoff = require('../models').timeoff
+const sequelize = require('sequelize')
 const Op = sequelize.Op
-const path = require("path");
-const { where } = require("sequelize");
-const env = process.env.NODE_ENV || "development";
-const config = require(path.join(__dirname, "..", "config", "config.json"))[
-  env
-];
-const seq = new sequelize(config.database, config.username, config.password, config);
+const seq = require('../models/rawQueries')
+
 const errorMessage = [
   {
     key: "inUse",
@@ -110,7 +105,7 @@ module.exports = {
           attributes: ["name"]
         }
       ],
-      order: [["date", "DESC"]],
+      order: [["_date", "DESC"], [sequelize.col("employee.last_name"), "ASC"]],
       attributes: [
         "id",
         "employee_id",

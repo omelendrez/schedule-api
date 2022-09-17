@@ -70,7 +70,7 @@ module.exports = {
           ]
         }],
         order: [
-          ['date', 'desc']
+          ['_date', 'desc']
         ],
       })
       .then(budget => res.json(budget))

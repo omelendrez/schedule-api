@@ -11,7 +11,7 @@ app.use(logger("dev"));
 app.use(cors())
 
 models.sequelize.sync({
-  alter: true
+  alter: false
 });
 
 // SELECT

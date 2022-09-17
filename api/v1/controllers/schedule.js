@@ -1,16 +1,7 @@
 'use strict'
 const Schedule = require('../models').schedule
-const Sequelize = require('sequelize')
 const sequelize = require('sequelize')
-const env = process.env.NODE_ENV || 'development'
-const config = require(__dirname + '/../config/config.json')[env]
-
-let seq
-if (config.use_env_variable) {
-  seq = new Sequelize(process.env[config.use_env_variable], config)
-} else {
-  seq = new Sequelize(config.database, config.username, config.password, config)
-}
+const seq = require('../models/rawQueries')
 
 const errorMessage = [
   {
