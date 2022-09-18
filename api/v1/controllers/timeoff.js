@@ -91,6 +91,11 @@ module.exports = {
 
     return Timeoff.findAndCountAll({
       raw: true,
+      where: {
+        date: {
+          [Op.between]: [req.query.date_from, req.query.date_to]
+        }
+      },
       include: [
         {
           model: Employee,
