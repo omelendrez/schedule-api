@@ -1,10 +1,10 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Budget = sequelize.define(
     "budget",
     {
       branch_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       date: {
@@ -12,18 +12,20 @@ module.exports = function(sequelize, DataTypes) {
         allowNull: false
       },
       hours: {
-        type: DataTypes.INTEGER,
-        allowNull: false
+        type: DataTypes.SMALLINT,
+        defaultValue: 0
       },
       program: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.SMALLINT,
         defaultValue: 0
       },
       footer: {
         type: DataTypes.STRING,
         allowNull: false
       }
-    },
+    }, {
+    timestamps: false
+  },
     {
       indexes: [
         {

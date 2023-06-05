@@ -30,9 +30,7 @@ module.exports = {
         limit: size,
         attributes: [
           'id',
-          'name',
-          [sequelize.fn('date_format', sequelize.col('sector.created_at'), '%d-%b-%y'), 'created_at'],
-          [sequelize.fn('date_format', sequelize.col('sector.updated_at'), '%d-%b-%y'), 'updated_at']
+          'name'
         ]
 
       })

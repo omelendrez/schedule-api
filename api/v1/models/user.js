@@ -1,5 +1,5 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const User = sequelize.define(
     "user",
     {
@@ -12,35 +12,39 @@ module.exports = function(sequelize, DataTypes) {
         }
       },
       password: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(20),
         defaultValue: "123"
       },
       full_name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
         allowNull: false
       },
       profile_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       branch_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       status_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         defaultValue: 1
       }
-    },
-    {
-      indexes: [
-        {
-          unique: true,
-          fields: ["user_name"]
-        }
-      ]
+    }, {
+    timestamps: false
+  });
+
+  User.prototype.toWeb = function (pw) {
+    const json = this.toJSON()
+    const removeFields = {
+      password: undefined,
+      created_at: undefined,
+      updated_at: undefined
     }
-  );
+    return { ...json, ...removeFields }
+  }
 
   return User;
 };
+

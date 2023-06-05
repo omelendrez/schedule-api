@@ -58,9 +58,7 @@ module.exports = {
           'hours',
           "program",
           'footer',
-          [sequelize.fn('weekday', sequelize.col('date')), 'weekday'],
-          [sequelize.fn('date_format', sequelize.col('budget.created_at'), '%d-%b-%y'), 'created_at'],
-          [sequelize.fn('date_format', sequelize.col('budget.updated_at'), '%d-%b-%y'), 'updated_at']
+          [sequelize.fn('weekday', sequelize.col('date')), 'weekday']
         ],
         include: [{
           model: Branch,
@@ -72,7 +70,7 @@ module.exports = {
           ]
         }],
         order: [
-          ['date', 'desc']
+          ['_date', 'desc']
         ],
       })
       .then(budget => res.json(budget))
@@ -117,15 +115,30 @@ module.exports = {
     return Budget
       .findOne({
         where: {
-          id: req.params.id,
-          program: 0
+          id: req.params.id
         }
       })
-      .then(budget => budget.destroy()
-        .then(result => {
-          res.json(result);
-        }))
-      .catch(error => res.status(400).send(error));
+      .then((budget) => {
+        if (budget.program === 0) {
+          budget.destroy()
+            .then(result => {
+              res.json(result);
+            })
+        } else {
+          res.status(400).send({
+            message: 'No se pudo eliminar',
+            detail: `Este presupuesto no se puede eliminar porque ya tiene ${budget.program} horas consumidas`,
+            data: {}
+          })
+        }
+      })
+      .catch((error) => {
+        res.status(500).send({
+          message: 'No se pudo eliminar',
+          detail: 'Este presupuesto no se pudo eliminar debido aun error interno',
+          data: error
+        })
+      });
   },
 
 };

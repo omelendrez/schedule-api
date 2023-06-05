@@ -1,6 +1,7 @@
 "use strict";
 const User = require("../models").user;
 const sequelize = require("sequelize");
+const jwt = require('jsonwebtoken')
 const Op = sequelize.Op
 
 const errorMessage = [
@@ -95,9 +96,7 @@ module.exports = {
           'full_name',
           'status_id',
           'profile_id',
-          'branch_id',
-          [sequelize.fn('date_format', sequelize.col('user.created_at'), '%d-%b-%y'), 'created_at'],
-          [sequelize.fn('date_format', sequelize.col('user.updated_at'), '%d-%b-%y'), 'updated_at']
+          'branch_id'
         ]
       })
       .then(users => res.json(users))
@@ -144,7 +143,6 @@ module.exports = {
   },
 
   login(req, res) {
-
     return User
       .findOne({
         where: {
@@ -153,9 +151,19 @@ module.exports = {
           status_id: 1
         }
       })
-      .then(user => user ? res.json(user) : res.json({
-        "id": 0
-      }))
+      .then((user) => {
+        if (user) {
+          const token = jwt.sign({
+            data: user.toWeb()
+          }, process.env.JWT_SECRET, { expiresIn: '1d' }, { algorithm: 'RS256' });
+          res.json({ ...user.toWeb(), token })
+        } else {
+          res.status(401).json({
+            message: 'Credenciales inválidas',
+            detail: 'El usuario o password ingresados son incorrectos. Por favor corrija las credenciales y vuelva a intentar.'
+          })
+        }
+      })
       .catch(error => res.status(400).send(error));
   },
 
@@ -238,5 +246,4 @@ module.exports = {
         msg: "Password actual no es correcta"
       }));
   }
-
 };

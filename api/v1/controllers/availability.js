@@ -40,9 +40,7 @@ module.exports = {
         attributes: [
           'id',
           'employee_id',
-          'week_day',
-          [sequelize.fn('date_format', sequelize.col('availability.created_at'), '%d-%b-%y'), 'created_at'],
-          [sequelize.fn('date_format', sequelize.col('availability.updated_at'), '%d-%b-%y'), 'updated_at']
+          'week_day'
         ]
       })
       .then(branch => res.json(branch))

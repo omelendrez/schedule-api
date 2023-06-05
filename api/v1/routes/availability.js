@@ -2,11 +2,14 @@
 const availability = require("../controllers/availability");
 const express = require("express");
 const router = express.Router();
+const auth = require('../middleware/auth')
 
-router.get("/", availability.findAll);
-router.get("/:id", availability.findById);
-router.get("/:id/employee", availability.findByEmployeeId);
-router.post("/", availability.create);
-router.put("/:id", availability.update);
+const secure = auth.validateToken
+
+router.get("/", secure, availability.findAll);
+router.get("/:id", secure, availability.findById);
+router.get("/:id/employee", secure, availability.findByEmployeeId);
+router.post("/", secure, availability.create);
+router.put("/:id", secure, availability.update);
 
 module.exports = router;

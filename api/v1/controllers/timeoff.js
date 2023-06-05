@@ -1,13 +1,9 @@
 "use strict";
-const Timeoff = require("../models").timeoff;
-const sequelize = require("sequelize");
+const Timeoff = require('../models').timeoff
+const sequelize = require('sequelize')
 const Op = sequelize.Op
-const path = require("path");
-const env = process.env.NODE_ENV || "development";
-const config = require(path.join(__dirname, "..", "config", "config.json"))[
-  env
-];
-const seq = new sequelize(config.database, config.username, config.password, config);
+const seq = require('../models/rawQueries')
+
 const errorMessage = [
   {
     key: "inUse",
@@ -30,7 +26,7 @@ const findMessage = key => {
 };
 
 module.exports = {
-  create (req, res) {
+  create(req, res) {
     const employee_id = req.body.employee_id
     const absenteeism_id = req.body.absenteeism_id
     const date = req.body.date
@@ -74,20 +70,36 @@ module.exports = {
     }
   },
 
-  findAll (req, res) {
+  findAll(req, res) {
     const Employee = require("../models").employee;
     const Absenteeism = require("../models").absenteeism;
     Timeoff.belongsTo(Employee);
     Timeoff.belongsTo(Absenteeism)
 
+    const { profile_id, branch_id } = req.decoded.data
+
+    let where = {
+      id: sequelize.col("timeoff.employee_id")
+    }
+
+    if (profile_id !== 1) {
+      where = {
+        ...where,
+        branch_id: branch_id
+      }
+    }
+
     return Timeoff.findAndCountAll({
       raw: true,
+      where: {
+        date: {
+          [Op.between]: [req.query.date_from, req.query.date_to]
+        }
+      },
       include: [
         {
           model: Employee,
-          where: {
-            id: sequelize.col("timeoff.employee_id")
-          },
+          where: where,
           attributes: ["badge", "first_name", "last_name", "branch_id"]
         },
         {
@@ -98,22 +110,20 @@ module.exports = {
           attributes: ["name"]
         }
       ],
-      order: [["date", "DESC"]],
+      order: [["_date", "DESC"], [sequelize.col("employee.last_name"), "ASC"]],
       attributes: [
         "id",
         "employee_id",
         "absenteeism_id",
         [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%d-%b-%Y"), "date"],
-        [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%Y-%m-%d"), "_date"],
-        [sequelize.fn("date_format", sequelize.col("timeoff.created_at"), "%d-%b-%y"), "created_at"],
-        [sequelize.fn("date_format", sequelize.col("timeoff.updated_at"), "%d-%b-%y"), "updated_at"]
+        [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%Y-%m-%d"), "_date"]
       ]
     })
       .then(timeoff => res.json(timeoff))
       .catch(error => res.status(400).send(error));
   },
 
-  findByEmployeeId (req, res) {
+  findByEmployeeId(req, res) {
     const Employee = require("../models").employee;
     Timeoff.belongsTo(Employee);
 
@@ -142,12 +152,14 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  findAllTimeTimeoffs (req, res) {
+  // Empleados de franto para el día determinado
+  findAllTimeTimeoffs(req, res) {
     return Timeoff.findAndCountAll({
       where: {
-        absenteeism_id: 1
+        absenteeism_id: 1,
+        date: req.query.date
       },
-      order: [['employee_id', 'ASC'], ["date", "DESC"]],
+      order: [['employee_id', 'ASC']],
       attributes: ['employee_id', [sequelize.fn("date_format", sequelize.col("timeoff.date"), "%d-%b-%Y"), "date"]]
     })
       .then(
@@ -161,7 +173,7 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  findByDate (req, res) {
+  findByDate(req, res) {
     const Employee = require("../models").employee;
     const Absenteeism = require("../models").absenteeism;
     Timeoff.belongsTo(Employee);
@@ -203,7 +215,7 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  findByPeriod (req, res) {
+  findByPeriod(req, res) {
     const Employee = require("../models").employee;
     const Absenteeism = require("../models").absenteeism;
     let order = ''
@@ -212,14 +224,12 @@ module.exports = {
         order = [
           [Employee, 'last_name', 'ASC'],
           [Employee, 'first_name', 'ASC'],
-          ['date', 'ASC']
+          ['id', 'ASC']
         ]
         break
       case '1':
         order = [
-          ['date', 'ASC'],
-          [Employee, 'last_name', 'ASC'],
-          [Employee, 'first_name', 'ASC']
+          ['id', 'ASC']
         ]
         break
     }
@@ -266,7 +276,7 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  delete (req, res) {
+  delete(req, res) {
     return Timeoff.findOne({
       where: {
         id: req.params.id
@@ -280,7 +290,7 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  update (req, res) {
+  update(req, res) {
     return Timeoff.findOne({
       where: {
         id: req.params.id

@@ -2,10 +2,13 @@
 const sector = require("../controllers/sector");
 const express = require("express");
 const router = express.Router();
+const auth = require('../middleware/auth')
 
-router.get("/", sector.findAll);
-router.post("/", sector.create);
-router.put("/:id", sector.update);
-router.delete("/:id", sector.delete);
+const secure = auth.validateToken
+
+router.get("/", secure, sector.findAll);
+router.post("/", secure, sector.create);
+router.put("/:id", secure, sector.update);
+router.delete("/:id", secure, sector.delete);
 
 module.exports = router;

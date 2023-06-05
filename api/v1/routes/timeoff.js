@@ -2,14 +2,17 @@
 const timeoff = require("../controllers/timeoff");
 const express = require("express");
 const router = express.Router();
+const auth = require('../middleware/auth')
 
-router.get("/:id/employee", timeoff.findByEmployeeId);
-router.get("/:date/date", timeoff.findByDate);
-router.get("/:date_from/:date_to/:absenteeism_id/:sort_by/period", timeoff.findByPeriod);
-router.get("/all", timeoff.findAllTimeTimeoffs);
-router.get("/", timeoff.findAll);
-router.post("/", timeoff.create);
-router.put("/:id", timeoff.update);
-router.delete("/:id", timeoff.delete);
+const secure = auth.validateToken
+
+router.get("/:id/employee", secure, timeoff.findByEmployeeId);
+router.get("/:date/date", secure, timeoff.findByDate);
+router.get("/:date_from/:date_to/:absenteeism_id/:sort_by/period", secure, timeoff.findByPeriod);
+router.get("/all", secure, timeoff.findAllTimeTimeoffs);
+router.get("/", secure, timeoff.findAll);
+router.post("/", secure, timeoff.create);
+router.put("/:id", secure, timeoff.update);
+router.delete("/:id", secure, timeoff.delete);
 
 module.exports = router;

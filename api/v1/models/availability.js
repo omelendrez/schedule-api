@@ -1,14 +1,14 @@
 "use strict";
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   const Availability = sequelize.define(
     "availability",
     {
       employee_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.SMALLINT,
         allowNull: false
       },
       week_day: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.TINYINT,
         allowNull: false
       },
       from: {
@@ -19,15 +19,9 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.CHAR(2),
         allowNull: false
       }
-    },
-    {
-      indexes: [
-        {
-          fields: ["employee_id"]
-        }
-      ]
-    }
-  );
+    }, {
+    timestamps: false
+  });
 
   return Availability;
 };
