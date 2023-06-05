@@ -7,7 +7,11 @@ const models = require(apiPath + '/models')
 const app = express()
 
 app.use(express.json())
-app.use(logger('dev'))
+app.use(
+  logger('dev', {
+    skip: (req, res) => res.statusCode < 400
+  })
+)
 // app.use(logger("tiny", { skip: () => process.env.NODE_ENV === 'production' }));
 app.use(cors())
 
