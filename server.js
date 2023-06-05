@@ -1,44 +1,3 @@
-<<<<<<< Updated upstream
-"use strict";
-const express = require("express");
-const bodyParser = require("body-parser");
-const logger = require("morgan");
-const apiPath = "./api/v1";
-const models = require(apiPath + "/models");
-
-const app = express();
-
-app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    extended: true
-  })
-);
-app.use(logger("dev"));
-
-models.sequelize.sync({
-  force: false
-});
-/*
-models.availability.sequelize.sync({
-  force: true
-});
-*/
-
-app.use(function(req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
-  res.setHeader("Access-Control-Allow-Credentials", true);
-  next();
-});
-=======
 'use strict'
 const express = require('express')
 const cors = require('cors')
@@ -48,11 +7,7 @@ const models = require(apiPath + '/models')
 const app = express()
 
 app.use(express.json())
-app.use(
-  logger('dev', {
-    skip: (req, res) => res.statusCode < 400
-  })
-)
+app.use(logger('dev'))
 // app.use(logger("tiny", { skip: () => process.env.NODE_ENV === 'production' }));
 app.use(cors())
 
@@ -100,7 +55,6 @@ app.use(function (req, res, next) {
   )
   next()
 })
->>>>>>> Stashed changes
 
 app.use('/absenteeism', require(apiPath + '/routes/absenteeism'))
 app.use('/availability', require(apiPath + '/routes/availability'))
@@ -118,9 +72,6 @@ app.use('/user', require(apiPath + '/routes/user'))
 
 app.use('/login', require(apiPath + '/routes/login'))
 
-<<<<<<< Updated upstream
-const port = process.env.PORT || 3010;
-=======
 app.use('/', function (req, res) {
   res.statusCode = 404
   res.json({ message: 'Error', detail: 'Recurso inexistente' })
@@ -140,15 +91,9 @@ app.use(function (err, req, res, next) {
 module.exports = app
 
 const port = process.env.PORT || 3010
->>>>>>> Stashed changes
 
 app.set('port', port)
 
-<<<<<<< Updated upstream
-app.listen(app.get("port"), function() {
-  console.log("Node app is running on port", app.get("port"));
-});
-=======
 app.listen(app.get('port'), function () {
   console.log('Node app is running on port', app.get('port'))
 })
@@ -156,4 +101,3 @@ app.listen(app.get('port'), function () {
 process.on('unhandledRejection', (error) => {
   console.error('Uncaught Error', console.error(error))
 })
->>>>>>> Stashed changes
