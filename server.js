@@ -9,7 +9,7 @@ const app = express()
 app.use(express.json())
 app.use(
   logger('dev', {
-    skip: (req, res) => res.statusCode < 400
+    skip: () => process.env.NODE_ENV === 'production'
   })
 )
 // app.use(logger("tiny", { skip: () => process.env.NODE_ENV === 'production' }));
